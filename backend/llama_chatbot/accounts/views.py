@@ -1,6 +1,5 @@
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -8,7 +7,6 @@ import json
 
 User = get_user_model()
 
-@csrf_exempt
 def login_view(request):
     if request.method == 'POST':
         try:
@@ -27,7 +25,6 @@ def login_view(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-@csrf_exempt
 def logout_view(request):
     if request.method == 'POST':
         logout(request)
@@ -35,14 +32,12 @@ def logout_view(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-@csrf_exempt
 def check_login_status(request):
     if request.user.is_authenticated:
         return JsonResponse({'message': 'User is logged in'}, status=200)
     else:
         return JsonResponse({'message': 'User is not logged in'}, status=200)
     
-@csrf_exempt
 def register_view(request):
     if request.method == 'POST':
         try:
@@ -80,7 +75,6 @@ def register_view(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-@csrf_exempt
 @login_required
 def delete_user_view(request):
     if request.method == 'DELETE':
