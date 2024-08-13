@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import ChatThread, ChatMessage
 from django.shortcuts import get_object_or_404
+from ollama import Client
 
 
 @csrf_exempt
@@ -70,8 +71,10 @@ def chat_with_model(request, thread_id):
             # Retrieve the chat thread
             thread = get_object_or_404(ChatThread, id=thread_id, user=request.user)
 
+            client = Client(host='http://localhost:11434')
+
             # Get the response from the model
-            response = ollama.chat(
+            response = client.chat(
                 model='llama3.1',
                 messages=[{'role': 'user', 'content': user_message}]
             )
