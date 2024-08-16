@@ -9,9 +9,9 @@ from django.shortcuts import get_object_or_404
 from ollama import Client
 
 
-@csrf_exempt
 @login_required
 @require_POST
+@csrf_exempt
 def chat_with_model_stream(request, thread_id):
     if request.method == 'POST':
         try:
@@ -56,9 +56,9 @@ def chat_with_model_stream(request, thread_id):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-@csrf_exempt
 @login_required
 @require_POST
+@csrf_exempt
 def chat_with_model(request, thread_id):
     if request.method == 'POST':
         try:
@@ -69,7 +69,7 @@ def chat_with_model(request, thread_id):
                 return JsonResponse({'error': 'No message provided'}, status=400)
             
             # Retrieve the chat thread
-            thread = get_object_or_404(ChatThread, id=thread_id, user=request.user)
+            thread = get_object_or_404(ChatThread, id=int(thread_id), user=request.user)
 
             client = Client(host='http://localhost:11434')
 
@@ -104,12 +104,12 @@ def chat_with_model(request, thread_id):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-@csrf_exempt
 @login_required
+@csrf_exempt
 def get_thread_messages(request, thread_id):
     if request.method == 'GET':
         # Get the chat thread
-        thread = get_object_or_404(ChatThread, id=thread_id, user=request.user)
+        thread = get_object_or_404(ChatThread, id=int(thread_id), user=request.user)
         
         # Get all messages for this thread
         messages = thread.messages.all().order_by('created_at')
@@ -124,17 +124,17 @@ def get_thread_messages(request, thread_id):
         
         return JsonResponse({'messages': messages_list}, status=200)
     
-@csrf_exempt
 @login_required
+@csrf_exempt
 def start_new_thread(request):
     if request.method == 'POST':
         # Create a new chat thread for the user
         thread = ChatThread.objects.create(user=request.user)
         return JsonResponse({'thread_id': thread.id}, status=201)
     
-@csrf_exempt
 @login_required
 @require_GET
+@csrf_exempt
 def get_user_threads(request):
     # Retrieve all chat threads for the logged-in user
     threads = ChatThread.objects.filter(user=request.user)
@@ -153,8 +153,8 @@ def get_user_threads(request):
     # Return the threads as JSON
     return JsonResponse({'threads': thread_data})
 
-@csrf_exempt
 @login_required
+@csrf_exempt
 def update_thread_title(request, thread_id):
     if request.method == 'PUT':
         try:
@@ -165,7 +165,7 @@ def update_thread_title(request, thread_id):
                 return JsonResponse({'error': 'No title provided'}, status=400)
 
             # Get the chat thread
-            thread = get_object_or_404(ChatThread, id=thread_id, user=request.user)
+            thread = get_object_or_404(ChatThread, id=int(thread_id), user=request.user)
 
             # Update the thread's title
             thread.title = new_title
@@ -184,7 +184,7 @@ def update_thread_title(request, thread_id):
 def delete_thread(request, thread_id):
     if request.method == 'POST':
         # Retrieve the chat thread
-        thread = get_object_or_404(ChatThread, id=thread_id, user=request.user)
+        thread = get_object_or_404(ChatThread, id=int(thread_id), user=request.user)
 
         # Delete the chat thread
         thread.delete()

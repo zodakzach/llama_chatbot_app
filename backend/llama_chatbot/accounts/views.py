@@ -4,9 +4,12 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 import json
+from django.views.decorators.csrf import csrf_exempt
+
 
 User = get_user_model()
 
+@csrf_exempt
 def login_view(request):
     if request.method == 'POST':
         try:
@@ -25,19 +28,23 @@ def login_view(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+@csrf_exempt
+@login_required
 def logout_view(request):
     if request.method == 'POST':
         logout(request)
         return JsonResponse({'message': 'Logout successful'}, status=200)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
+
+@csrf_exempt
 def check_login_status(request):
     if request.user.is_authenticated:
         return JsonResponse({'message': 'User is logged in'}, status=200)
     else:
         return JsonResponse({'message': 'User is not logged in'}, status=200)
-    
+ 
+@csrf_exempt
 def register_view(request):
     if request.method == 'POST':
         try:
@@ -76,6 +83,7 @@ def register_view(request):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
 @login_required
+@csrf_exempt
 def delete_user_view(request):
     if request.method == 'DELETE':
         user = request.user
@@ -89,6 +97,8 @@ def is_admin(user):
     return user.is_staff or user.is_superuser
 
 @user_passes_test(is_admin)
+@login_required
+@csrf_exempt
 def deactivate_user(request, username):
     try:
         user = User.objects.get(username=username)
@@ -97,3 +107,4 @@ def deactivate_user(request, username):
         return JsonResponse({'message': f'User {username} has been deactivated.'}, status=200)
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found'}, status=404)
+    
