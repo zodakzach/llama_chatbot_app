@@ -16,7 +16,7 @@ const SideBar: React.FC = () => {
     const fetchChatThreads = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/chat/threads/', {
-          method: 'GET',  // or 'POST' if needed
+          method: 'GET', 
           credentials: 'include',  // Include credentials with the request
         });
         const data = await response.json();

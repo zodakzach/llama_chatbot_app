@@ -2,9 +2,8 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 // Define the ChatThread interface
 interface ChatThread {
-  id: number; // Assuming ID is a number
+  id: number; 
   title: string;
-  // Add other fields as necessary
 }
 
 // Create the context with the correct type

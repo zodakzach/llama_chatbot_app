@@ -5,6 +5,7 @@ import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import ChatPage from './pages/ChatPage'
 import NotFoundPage from './pages/NotFoundPage'
+import ProtectedRoute from './components/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
@@ -14,7 +15,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/chat/*',
-    element: <ChatPage/>,
+    element: <ProtectedRoute element={<ChatPage />} />,
     errorElement:<NotFoundPage/>,
   }
 ]);

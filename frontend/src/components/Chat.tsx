@@ -1,11 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ollama_icon from '../assets/images/ollama_icon.png';
 import { useParams } from 'react-router-dom';
-
-interface Message {
-  content: string;
-  sender: 'user' | 'bot';
-}
+import { fetchMessages, sendMessage, createNewThread, Message } from '../api/chat';
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -24,108 +20,52 @@ const Chat: React.FC = () => {
   }, [messages]);
 
   useEffect(() => {
-    const fetchInitialMessages = async () => {
-      if (chatId && chatId !== 'new') {
+    const loadMessages = async () => {
+      if (chatId) { // Ensure chatId is defined and not undefined
         try {
-          const response = await fetch(`http://127.0.0.1:8000/chat/threads/${chatId}/messages/`, {
-            method: 'GET',
-            credentials: 'include', // Include credentials like cookies in the request
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-          const data = await response.json();
-          setMessages(data.messages);
-          setIsThreadCreated(true)
-          setCurrentThreadId(chatId);
+          const { messages, isThreadCreated, currentThreadId } = await fetchMessages(chatId);
+          setMessages(messages);
+          setIsThreadCreated(isThreadCreated);
+          setCurrentThreadId(currentThreadId);
         } catch (error) {
-          console.error('Failed to fetch chat messages:', error);
+          console.error('Failed to load messages:', error);
         }
-      } else if (chatId === 'new') {
-        setMessages([]); // Start with an empty chat for a new thread
-        setIsThreadCreated(false);
-        setCurrentThreadId(null);
-        setLoading(false);
       }
     };
-
-    fetchInitialMessages();
+  
+    loadMessages();
   }, [chatId]);
-
-  const sendMessage = async (threadId: string, message: string) => {
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/chat/response/${threadId}/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message }),
-        credentials: 'include', // Include credentials like cookies in the request
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      const botResponse = data.response; // Access the bot's response
-
-      // Update messages state with the bot's response
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { content: botResponse, sender: 'bot' },
-      ]);
-      
-      console.log('Message sent:', data);
-    } catch (error) {
-      console.error('Failed to send message:', error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
-      // Disable input while waiting for bot response
       setLoading(true);
 
-      const userMsg = input
-
-      // Add user message
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { content: userMsg, sender: 'user' },
-      ]);
+      const userMsg = input;
+      setMessages((prevMessages) => [...prevMessages, { content: userMsg, sender: 'user' }]);
       setInput('');
 
       if (!isThreadCreated) {
         try {
-          const response = await fetch('http://127.0.0.1:8000/chat/threads/new/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include', // Include credentials like cookies in the request
-          });
-      
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-      
-          const { thread_id } = await response.json(); // Extract thread_id from the response
-          setCurrentThreadId(thread_id);
+          const threadId = await createNewThread();
+          setCurrentThreadId(threadId);
           setIsThreadCreated(true);
-          await sendMessage(thread_id, userMsg);
+          const botMessage = await sendMessage(threadId, userMsg);
+          setMessages((prevMessages) => [...prevMessages, botMessage]);
         } catch (error) {
           console.error('Failed to create chat thread:', error);
         }
-    } else if (currentThreadId) {
-      // If thread already created, send the message to the existing thread
-      await sendMessage(currentThreadId, userMsg);
-    }
+      } else if (currentThreadId) {
+        try {
+          const botMessage = await sendMessage(currentThreadId, userMsg);
+          setMessages((prevMessages) => [...prevMessages, botMessage]);
+        } catch (error) {
+          console.error('Failed to send message:', error);
+        }
+      }
 
-    // Re-enable input after bot responds
-    setLoading(false);
-  };
+      setLoading(false);
+    }
 };
 
   return (

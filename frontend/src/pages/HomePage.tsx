@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { login } from '../api/auth'; // Import the login function
+
 const HomePage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -6,25 +8,13 @@ const HomePage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await fetch('http://127.0.0.1:8000/auth/login/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Make sure to include credentials
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        // Handle successful login (e.g., redirect to another page)
-        window.location.href = '/chat'; // Redirect to a dashboard or another page
-      } else {
-        const data = await response.json();
-        setError(data.error || 'Login failed');
-      }
-    } catch (error) {
-      setError('An error occurred');
+    const result = await login(username, password);
+    
+    if (result.success) {
+      // Handle successful login (e.g., redirect to another page)
+      window.location.href = '/chat'; // Redirect
+    } else {
+      setError(result.error ?? 'An unexpected error occurred'); // Provide a fallback string
     }
   };
 
