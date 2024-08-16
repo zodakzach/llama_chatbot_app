@@ -5,6 +5,13 @@ export interface Message {
   sender: "user" | "bot";
 }
 
+export interface ChatThread {
+  id: number;
+  title: string;
+}
+
+const API_URL = import.meta.env.VITE_BACKEND_API_URL;
+
 export const fetchMessages = async (
   chatId: string,
 ): Promise<{
@@ -15,7 +22,7 @@ export const fetchMessages = async (
   if (chatId && chatId !== "new") {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/chat/threads/${chatId}/messages/`,
+        `${API_URL}/chat/threads/${chatId}/messages/`,
         {
           method: "GET",
           credentials: "include",
@@ -50,7 +57,7 @@ export const sendMessage = async (
 ): Promise<Message> => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/chat/response/${threadId}/`,
+      `${API_URL}/chat/response/${threadId}/`,
       {
         method: "POST",
         headers: {
@@ -78,7 +85,7 @@ export const sendMessage = async (
 
 export const createNewThread = async (): Promise<string> => {
   try {
-    const response = await fetch("http://127.0.0.1:8000/chat/threads/new/", {
+    const response = await fetch(`${API_URL}/chat/threads/new/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -98,9 +105,9 @@ export const createNewThread = async (): Promise<string> => {
   }
 };
 
-export const fetchChatThreads = async (): Promise<{ threads: any[] }> => {
+export const fetchChatThreads = async (): Promise<{ threads: ChatThread[] }> => {
   try {
-    const response = await fetch("http://127.0.0.1:8000/chat/threads/", {
+    const response = await fetch(`${API_URL}/chat/threads/`, {
       method: "GET",
       credentials: "include", // Include credentials with the request
     });
@@ -116,3 +123,54 @@ export const fetchChatThreads = async (): Promise<{ threads: any[] }> => {
     throw error; // Re-throw the error to be handled by the caller
   }
 };
+
+export async function updateThreadTitle(threadId: number, newTitle: string): Promise<void> {
+  const url = `${API_URL}/chat/threads/${threadId}/update-title/`;
+  
+  try {
+      const response = await fetch(url, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+              // Add any other headers required by your backend, such as authentication tokens
+          },
+          credentials: "include", // Include credentials with the request
+          body: JSON.stringify({ title: newTitle }),
+      });
+
+      if (!response.ok) {
+          throw new Error(`Failed to update thread title: ${response.statusText}`);
+      }
+
+      // Optionally handle the response here (e.g., confirm update, log success)
+      console.log('Thread title updated successfully.');
+  } catch (error) {
+      // Handle errors here (e.g., show a user-friendly message)
+      console.error('Error updating thread title:', error);
+  }
+}
+
+export async function deleteThread(threadId: number): Promise<void> {
+  const url = `${API_URL}/chat/threads/${threadId}/delete/`;
+  
+  try {
+      const response = await fetch(url, {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json',
+              // Add any other headers required by your backend, such as authentication tokens
+          },
+          credentials: "include", // Include credentials with the request
+      });
+
+      if (!response.ok) {
+          throw new Error(`Failed to delete thread: ${response.statusText}`);
+      }
+
+      // Optionally handle the response here (e.g., confirm deletion, log success)
+      console.log('Thread deleted successfully.');
+  } catch (error) {
+      // Handle errors here (e.g., show a user-friendly message)
+      console.error('Error deleting thread:', error);
+  }
+}

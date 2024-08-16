@@ -1,10 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
-
-// Define the ChatThread interface
-interface ChatThread {
-  id: number;
-  title: string;
-}
+import { ChatThread } from "../api/chat";
 
 // Create the context with the correct type
 const ChatContext = createContext<{

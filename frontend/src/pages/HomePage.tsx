@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { login } from "../api/auth"; // Import the login function
+import { useNavigate } from 'react-router-dom';
 
 const HomePage: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -12,7 +14,8 @@ const HomePage: React.FC = () => {
 
     if (result.success) {
       // Handle successful login (e.g., redirect to another page)
-      window.location.href = "/chat"; // Redirect
+      navigate('/chat');
+      // Redirect
     } else {
       setError(result.error ?? "An unexpected error occurred"); // Provide a fallback string
     }

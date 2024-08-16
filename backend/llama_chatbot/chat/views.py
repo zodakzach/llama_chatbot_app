@@ -176,10 +176,9 @@ def update_thread_title(request, thread_id):
 
 
 @login_required
-@require_POST
 @csrf_exempt
 def delete_thread(request, thread_id):
-    if request.method == "POST":
+    if request.method == "DELETE":
         # Retrieve the chat thread
         thread = get_object_or_404(ChatThread, id=int(thread_id), user=request.user)
 

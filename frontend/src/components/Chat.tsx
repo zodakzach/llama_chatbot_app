@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import ollama_icon from "../assets/images/ollama_icon.png";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   fetchMessages,
   sendMessage,
   createNewThread,
   Message,
+  ChatThread,
 } from "../api/chat";
+import { useChatContext } from "../contexts/ChatContext";
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -16,6 +18,9 @@ const Chat: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const [isThreadCreated, setIsThreadCreated] = useState<boolean>(false);
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { chatThreads, setChatThreads } = useChatContext();
+  const location = useLocation();
 
   // Scroll to the bottom of the chat when new messages are added
   useEffect(() => {
@@ -23,6 +28,15 @@ const Chat: React.FC = () => {
       endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  useEffect(() => {
+    // Clear messages when navigating to /chat/new
+    if (location.pathname === "/chat/new") {
+      setMessages([]); // Clear messages
+      setCurrentThreadId(null);
+      setIsThreadCreated(false);
+    }
+  }, [location.pathname, setMessages]);
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -58,10 +72,18 @@ const Chat: React.FC = () => {
       if (!isThreadCreated) {
         try {
           const threadId = await createNewThread();
+
+          const newThread: ChatThread = {
+            id: Number(threadId),
+            title: "New Chat",
+          };   
           setCurrentThreadId(threadId);
           setIsThreadCreated(true);
+          // Navigate to the newly created thread's route
           const botMessage = await sendMessage(threadId, userMsg);
           setMessages((prevMessages) => [...prevMessages, botMessage]);
+          setChatThreads((prevThreads) => [...prevThreads, newThread]);
+          navigate(`/chat/${threadId}`);
         } catch (error) {
           console.error("Failed to create chat thread:", error);
         }
@@ -73,7 +95,6 @@ const Chat: React.FC = () => {
           console.error("Failed to send message:", error);
         }
       }
-
       setLoading(false);
     }
   };

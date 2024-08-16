@@ -1,6 +1,8 @@
+const API_URL = import.meta.env.VITE_BACKEND_API_URL;
+
 export const checkLoginStatus = async (): Promise<boolean> => {
   try {
-    const response = await fetch("http://127.0.0.1:8000/auth/status/", {
+    const response = await fetch(`${API_URL}/auth/status/`, {
       method: "GET",
       credentials: "include", // Ensures cookies are sent with the request
     });
@@ -27,7 +29,7 @@ export const login = async (
   password: string,
 ): Promise<LoginResponse> => {
   try {
-    const response = await fetch("http://127.0.0.1:8000/auth/login/", {
+    const response = await fetch(`${API_URL}/auth/login/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

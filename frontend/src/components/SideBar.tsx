@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import sideBarCollapse from "../assets/images/sidebar-collapse-toggle.svg";
 import sideBarExpand from "../assets/images/sidebar-expand-toggle.svg";
 import { useChatContext } from "../contexts/ChatContext";
-import { NavLink } from "react-router-dom";
-import { fetchChatThreads } from "../api/chat";
+import { fetchChatThreads, updateThreadTitle, deleteThread } from "../api/chat";
+import ChatThreadsList from './ChatThreadList';
+import { useNavigate } from 'react-router-dom';
 
 const SideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const { chatThreads, setChatThreads } = useChatContext();
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -25,6 +27,48 @@ const SideBar: React.FC = () => {
 
     loadChatThreads();
   }, []);
+
+  const handleRename = async (threadId: number, newTitle: string) => {
+    setChatThreads((prevThreads) =>
+      prevThreads.map((thread) =>
+        thread.id === threadId ? { ...thread, title: newTitle } : thread
+      )
+    );
+
+    try {
+      // Call the function to update the title on the server
+      await updateThreadTitle(threadId, newTitle);
+    } catch (error) {
+      // Handle errors and possibly revert the UI update if needed
+      console.error('Error updating thread title:', error);
+      // Optionally revert the UI update if the server update fails
+      setChatThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread.id === threadId ? { ...thread, title: thread.title } : thread
+        )
+      );
+    }
+  };
+
+  const handleDelete = async (threadId: number) => {
+    setChatThreads((prevThreads) =>
+      prevThreads.filter((thread) => thread.id !== threadId)
+    );
+
+    try {
+      // Call the function to delete the thread on the server
+      await deleteThread(threadId);
+      navigate('/chat/new');
+    } catch (error) {
+      // Handle errors and possibly revert the UI update if needed
+      console.error('Error deleting thread:', error);
+  
+      // Optionally revert the UI update if the server deletion fails
+      setChatThreads((prevThreads) =>
+        [...prevThreads, { id: threadId, title: 'Deleted Thread', /* other properties */ }]
+      );
+    }
+  };
 
   return (
     <div className="flex">
@@ -48,21 +92,12 @@ const SideBar: React.FC = () => {
         </button>
         {isOpen && (
           <div className="p-4">
-            <h2 className="text-xl font-bold">Chat Logs</h2>
-            <ul>
-              {chatThreads.map((thread) => (
-                <li key={thread.id}>
-                  <NavLink
-                    to={`/chat/${thread.id}`}
-                    className={({ isActive }) =>
-                      `block rounded p-2 ${isActive ? "bg-gray-600" : "hover:bg-gray-700"}`
-                    }
-                  >
-                    {thread.title}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
+            <h2 className="text-xl font-bold p-2">Chat Logs</h2>
+            <ChatThreadsList
+              chatThreads={chatThreads}
+              onRename={handleRename}
+              onDelete={handleDelete}
+            />
           </div>
         )}
       </div>
