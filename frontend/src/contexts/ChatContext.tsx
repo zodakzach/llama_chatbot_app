@@ -1,8 +1,8 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from "react";
 
 // Define the ChatThread interface
 interface ChatThread {
-  id: number; 
+  id: number;
   title: string;
 }
 
@@ -19,7 +19,9 @@ const ChatContext = createContext<{
 export const useChatContext = () => useContext(ChatContext);
 
 // ChatProvider component
-export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ChatProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [chatThreads, setChatThreads] = useState<ChatThread[]>([]);
 
   return (

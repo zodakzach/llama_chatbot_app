@@ -1,7 +1,7 @@
 // src/components/ProtectedRoute.tsx
-import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { checkLoginStatus } from '../api/auth'; // Import the function
+import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { checkLoginStatus } from "../api/auth"; // Import the function
 
 interface ProtectedRouteProps {
   element: JSX.Element;

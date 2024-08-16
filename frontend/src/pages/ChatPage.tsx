@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import Chat from '../components/Chat';
-import SideBar from '../components/SideBar';
-import { ChatProvider, useChatContext } from '../contexts/ChatContext';
+import React, { useEffect } from "react";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import Chat from "../components/Chat";
+import SideBar from "../components/SideBar";
+import { ChatProvider, useChatContext } from "../contexts/ChatContext";
 
 // Component to handle default chat creation
 const DefaultChatHandler: React.FC = () => {
@@ -12,8 +12,8 @@ const DefaultChatHandler: React.FC = () => {
 
   useEffect(() => {
     // If the path is just '/chat' and no threads exist, redirect to 'new'
-    if (location.pathname === '/chat' && chatThreads.length === 0) {
-      navigate('/chat/new');
+    if (location.pathname === "/chat" && chatThreads.length === 0) {
+      navigate("/chat/new");
     }
   }, [chatThreads, location.pathname, navigate]);
 
