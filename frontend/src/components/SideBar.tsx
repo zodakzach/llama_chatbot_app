@@ -3,6 +3,7 @@ import sideBarCollapse from '../assets/images/sidebar-collapse-toggle.svg';
 import sideBarExpand from '../assets/images/sidebar-expand-toggle.svg';
 import { useChatContext } from '../contexts/ChatContext';
 import { NavLink } from 'react-router-dom';
+import { fetchChatThreads } from '../api/chat';
 
 const SideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(true);
@@ -13,21 +14,17 @@ const SideBar: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchChatThreads = async () => {
+    const loadChatThreads = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/chat/threads/', {
-          method: 'GET', 
-          credentials: 'include',  // Include credentials with the request
-        });
-        const data = await response.json();
+        const data = await fetchChatThreads();
         setChatThreads(data.threads);
       } catch (error) {
-        console.error('Failed to fetch chat threads:', error);
+        console.error('Failed to load chat threads:', error);
       }
     };
 
-    fetchChatThreads();
-  }, [setChatThreads]);
+    loadChatThreads();
+  }, []);
 
   return (
     <div className="flex">

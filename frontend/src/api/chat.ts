@@ -83,3 +83,21 @@ export interface Message {
     }
   };
   
+  export const fetchChatThreads = async (): Promise<{ threads: any[] }> => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/chat/threads/', {
+        method: 'GET',
+        credentials: 'include',  // Include credentials with the request
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Failed to fetch chat threads:', error);
+      throw error; // Re-throw the error to be handled by the caller
+    }
+  };
