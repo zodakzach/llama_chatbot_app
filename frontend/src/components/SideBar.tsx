@@ -6,6 +6,7 @@ import { fetchChatThreads, updateThreadTitle, deleteThread } from "../api/chat";
 import ChatThreadsList from "./ChatThreadList";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
+import newChatIcon from '../assets/images/new_chat_icon.svg'
 
 const SideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(true);
@@ -13,10 +14,10 @@ const SideBar: React.FC = () => {
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
-    setIsOpen(!isOpen);
+    setIsOpen(!isOpen)
   };
 
-  // Assuming fetchChatThreads is your API call function
+  //Fetch chat threads
   const { data, error, isLoading } = useQuery({
     queryKey: ['chatThreads'],
     queryFn: fetchChatThreads,
@@ -50,7 +51,6 @@ const SideBar: React.FC = () => {
     } catch (error) {
       // Handle errors and possibly revert the UI update if needed
       console.error("Error updating thread title:", error);
-      // Optionally revert the UI update if the server update fails
       setChatThreads((prevThreads) =>
         prevThreads.map((thread) =>
           thread.id === threadId ? { ...thread, title: thread.title } : thread,
@@ -80,28 +80,39 @@ const SideBar: React.FC = () => {
     }
   };
 
+  // Navigate to create a new chat
+  const handleNewChat = () => {
+    navigate("/chat/new");
+  };
+
   return (
-    <div className="flex">
-      {/* Sidebar */}
+    <div className='flex'>
       <div
-        className={`${
-          isOpen ? "w-64" : "w-10"
-        } transition-width h-screen overflow-hidden bg-gray-800 text-white duration-300`}
+        className={`transition-all duration-300 ${isOpen ? "w-64" : "w-10"} h-screen bg-gray-800 text-white`}
       >
-        <button
-          className={`bg-gray-800 p-2 text-white ${
-            isOpen ? "ml-2" : "ml-2"
-          } transform transition-transform duration-300`}
-          onClick={toggleSidebar}
-        >
-          {isOpen ? (
-            <img src={sideBarCollapse}></img>
-          ) : (
-            <img src={sideBarExpand}></img>
+        <div className="flex justify-between">
+          <button
+            className="bg-gray-800 p-2 text-white"
+            onClick={toggleSidebar}
+          >
+            {isOpen ? (
+              <img src={sideBarCollapse} alt="Collapse Sidebar" />
+            ) : (
+              <img src={sideBarExpand} alt="Expand Sidebar" />
+            )}
+          </button>
+          {isOpen && (
+            <button
+              onClick={handleNewChat}
+              className={` py-2 px-4`}
+            >
+              <img src={newChatIcon} alt='New Chat Icon'/>
+            </button>
           )}
-        </button>
+        </div>
+
         {isOpen && (
-          <div className="p-4">
+          <div className='p-4'>
             <h2 className="p-2 text-xl font-bold">Chat Logs</h2>
             <ChatThreadsList
               chatThreads={chatThreads}

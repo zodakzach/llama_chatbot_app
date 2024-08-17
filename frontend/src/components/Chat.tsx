@@ -9,6 +9,8 @@ import {
 } from "../api/chat";
 import { useChatContext } from "../contexts/ChatContext";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from 'remark-gfm'; // For GitHub Flavored Markdown (tables, strikethrough, etc.)
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -131,10 +133,39 @@ const Chat: React.FC = () => {
               )}
               <div
                 className={`max-w-xl rounded-lg p-3 ${
-                  msg.sender === "bot" ? "text-white" : "bg-gray-800 text-white"
+                  msg.sender === "bot" ? "text-white break-words" : "bg-gray-800 text-white"
                 }`}
               >
-                {msg.content}
+                <ReactMarkdown 
+                  children={msg.content} 
+                  remarkPlugins={[remarkGfm]} 
+                  className="whitespace-pre-wrap break-words overflow-x-auto" // Ensures text wraps correctly
+                  components={{
+                    // Style for code blocks
+                    code({ node, className, children, ...props }) {
+                      const language = className?.replace("language-", "") || "";
+                      return className ? (
+                        <pre className="bg-gray-800 text-white p-3 rounded overflow-x-auto">
+                          <code className={`language-${language}`} {...props}>
+                            {String(children).replace(/\n$/, '')}
+                          </code>
+                        </pre>
+                      ) : (
+                        <code className={`bg-gray-200 p-1 rounded`} {...props}>
+                          {String(children)}
+                        </code>
+                      );
+                    },
+                    // Style for paragraphs
+                    p({ node, children, ...props }) {
+                      return (
+                        <p className="whitespace-pre-wrap break-words" {...props}>
+                          {children}
+                        </p>
+                      );
+                    },
+                  }}
+                />
               </div>
             </div>
           ))}
