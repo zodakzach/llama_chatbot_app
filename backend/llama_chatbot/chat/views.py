@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from ollama import Client
 from .utils import truncate_context
 
+
 @login_required
 @require_POST
 @csrf_exempt
@@ -64,7 +65,7 @@ def chat_with_model(request, thread_id):
 
             if not user_message:
                 return JsonResponse({"error": "No message provided"}, status=400)
-            
+
             context_str = truncate_context(user_message)
 
             # Retrieve the chat thread
@@ -80,13 +81,13 @@ def chat_with_model(request, thread_id):
             # Extract the content from the response
             message_content = response.get("message", {}).get("content", "")
 
-            messages = user_message.split('\n')
+            messages = user_message.split("\n")
 
             # Find the last user message
-            last_user_message = ''
+            last_user_message = ""
             for msg in reversed(messages):
-                if msg.startswith('user:'):
-                    last_user_message = msg[len('user:'):].strip()
+                if msg.startswith("user:"):
+                    last_user_message = msg[len("user:") :].strip()
                     break
 
             # Create and save the user message
@@ -149,7 +150,7 @@ def get_user_threads(request):
     thread_data = [
         {
             "id": thread.id,
-            "title": thread.title,  
+            "title": thread.title,
             "created_at": thread.created_at,
             "updated_at": thread.updated_at,
         }

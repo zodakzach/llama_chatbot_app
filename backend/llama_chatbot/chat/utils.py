@@ -14,10 +14,10 @@ def truncate_context(context_str):
 
     # Check if the context exceeds the maximum length
     while len(context_str) > max_length:
-        lines = context_str.split('\n')
+        lines = context_str.split("\n")
         # Remove the first message (oldest)
         lines = lines[1:]
         # Rebuild the context
-        context_str = '\n'.join(lines)
+        context_str = "\n".join(lines)
 
     return context_str

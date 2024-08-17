@@ -10,7 +10,7 @@ import {
 import { useChatContext } from "../contexts/ChatContext";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
-import remarkGfm from 'remark-gfm'; // For GitHub Flavored Markdown (tables, strikethrough, etc.)
+import remarkGfm from "remark-gfm"; // For GitHub Flavored Markdown (tables, strikethrough, etc.)
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -104,10 +104,10 @@ const Chat: React.FC = () => {
       // Create a single string from the conversation history including the user's message
       const context = [
         ...messages,
-        { content: userMsg, sender: "user" } // Include the new user message
+        { content: userMsg, sender: "user" }, // Include the new user message
       ]
-      .map((msg) => `${msg.sender}: ${msg.content}`)
-      .join('\n');
+        .map((msg) => `${msg.sender}: ${msg.content}`)
+        .join("\n");
 
       createThreadAndSendMessageMutation.mutate(context);
     }
@@ -133,25 +133,28 @@ const Chat: React.FC = () => {
               )}
               <div
                 className={`max-w-xl rounded-lg p-3 ${
-                  msg.sender === "bot" ? "text-white break-words" : "bg-gray-800 text-white"
+                  msg.sender === "bot"
+                    ? "break-words text-white"
+                    : "bg-gray-800 text-white"
                 }`}
               >
-                <ReactMarkdown 
-                  children={msg.content} 
-                  remarkPlugins={[remarkGfm]} 
-                  className="whitespace-pre-wrap break-words overflow-x-auto" // Ensures text wraps correctly
+                <ReactMarkdown
+                  children={msg.content}
+                  remarkPlugins={[remarkGfm]}
+                  className="overflow-x-auto whitespace-pre-wrap break-words" // Ensures text wraps correctly
                   components={{
                     // Style for code blocks
                     code({ node, className, children, ...props }) {
-                      const language = className?.replace("language-", "") || "";
+                      const language =
+                        className?.replace("language-", "") || "";
                       return className ? (
-                        <pre className="bg-gray-800 text-white p-3 rounded overflow-x-auto">
+                        <pre className="overflow-x-auto rounded bg-gray-800 p-3 text-white">
                           <code className={`language-${language}`} {...props}>
-                            {String(children).replace(/\n$/, '')}
+                            {String(children).replace(/\n$/, "")}
                           </code>
                         </pre>
                       ) : (
-                        <code className={`bg-gray-200 p-1 rounded`} {...props}>
+                        <code className={`rounded bg-gray-200 p-1`} {...props}>
                           {String(children)}
                         </code>
                       );
@@ -159,7 +162,10 @@ const Chat: React.FC = () => {
                     // Style for paragraphs
                     p({ node, children, ...props }) {
                       return (
-                        <p className="whitespace-pre-wrap break-words" {...props}>
+                        <p
+                          className="whitespace-pre-wrap break-words"
+                          {...props}
+                        >
                           {children}
                         </p>
                       );

@@ -6,8 +6,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ChatPage from "./pages/ChatPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +22,7 @@ const router = createBrowserRouter([
       <QueryClientProvider client={queryClient}>
         <ProtectedRoute element={<ChatPage />} />
       </QueryClientProvider>
-    ),   
+    ),
     errorElement: <NotFoundPage />,
   },
 ]);

@@ -5,8 +5,8 @@ import { useChatContext } from "../contexts/ChatContext";
 import { fetchChatThreads, updateThreadTitle, deleteThread } from "../api/chat";
 import ChatThreadsList from "./ChatThreadList";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from '@tanstack/react-query';
-import newChatIcon from '../assets/images/new_chat_icon.svg'
+import { useQuery } from "@tanstack/react-query";
+import newChatIcon from "../assets/images/new_chat_icon.svg";
 
 const SideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(true);
@@ -14,12 +14,12 @@ const SideBar: React.FC = () => {
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
-    setIsOpen(!isOpen)
+    setIsOpen(!isOpen);
   };
 
   //Fetch chat threads
   const { data, error, isLoading } = useQuery({
-    queryKey: ['chatThreads'],
+    queryKey: ["chatThreads"],
     queryFn: fetchChatThreads,
   });
 
@@ -86,7 +86,7 @@ const SideBar: React.FC = () => {
   };
 
   return (
-    <div className='flex'>
+    <div className="flex">
       <div
         className={`transition-all duration-300 ${isOpen ? "w-64" : "w-10"} h-screen bg-gray-800 text-white`}
       >
@@ -102,17 +102,14 @@ const SideBar: React.FC = () => {
             )}
           </button>
           {isOpen && (
-            <button
-              onClick={handleNewChat}
-              className={` py-2 px-4`}
-            >
-              <img src={newChatIcon} alt='New Chat Icon'/>
+            <button onClick={handleNewChat} className={`px-4 py-2`}>
+              <img src={newChatIcon} alt="New Chat Icon" />
             </button>
           )}
         </div>
 
         {isOpen && (
-          <div className='p-4'>
+          <div className="p-4">
             <h2 className="p-2 text-xl font-bold">Chat Logs</h2>
             <ChatThreadsList
               chatThreads={chatThreads}
