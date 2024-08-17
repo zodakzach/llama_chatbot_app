@@ -7,7 +7,7 @@ import json
 from .models import ChatThread, ChatMessage
 from django.shortcuts import get_object_or_404
 from ollama import Client
-
+from .utils import truncate_context
 
 @login_required
 @require_POST
@@ -64,6 +64,8 @@ def chat_with_model(request, thread_id):
 
             if not user_message:
                 return JsonResponse({"error": "No message provided"}, status=400)
+            
+            context_str = truncate_context(user_message)
 
             # Retrieve the chat thread
             thread = get_object_or_404(ChatThread, id=int(thread_id), user=request.user)
@@ -72,7 +74,7 @@ def chat_with_model(request, thread_id):
 
             # Get the response from the model
             response = client.chat(
-                model="llama3.1", messages=[{"role": "user", "content": user_message}]
+                model="llama3.1", messages=[{"role": "user", "content": context_str}]
             )
 
             # Extract the content from the response
