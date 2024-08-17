@@ -5,6 +5,7 @@ import { useChatContext } from "../contexts/ChatContext";
 import { fetchChatThreads, updateThreadTitle, deleteThread } from "../api/chat";
 import ChatThreadsList from "./ChatThreadList";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from '@tanstack/react-query';
 
 const SideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(true);
@@ -15,18 +16,26 @@ const SideBar: React.FC = () => {
     setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    const loadChatThreads = async () => {
-      try {
-        const data = await fetchChatThreads();
-        setChatThreads(data.threads);
-      } catch (error) {
-        console.error("Failed to load chat threads:", error);
-      }
-    };
+  // Assuming fetchChatThreads is your API call function
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['chatThreads'],
+    queryFn: fetchChatThreads,
+  });
 
-    loadChatThreads();
-  }, []);
+  // Effect to handle side effects and update chat threads state
+  useEffect(() => {
+    if (data?.threads) {
+      setChatThreads(data.threads);
+    }
+  }, [data]); // Depend on data to update when it changes
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading chat threads: {error.message}</div>;
+  }
 
   const handleRename = async (threadId: number, newTitle: string) => {
     setChatThreads((prevThreads) =>

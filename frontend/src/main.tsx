@@ -6,6 +6,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ChatPage from "./pages/ChatPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -15,7 +19,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/chat/*",
-    element: <ProtectedRoute element={<ChatPage />} />,
+    element: (
+      <QueryClientProvider client={queryClient}>
+        <ProtectedRoute element={<ChatPage />} />
+      </QueryClientProvider>
+    ),   
     errorElement: <NotFoundPage />,
   },
 ]);
