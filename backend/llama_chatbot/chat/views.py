@@ -78,9 +78,18 @@ def chat_with_model(request, thread_id):
             # Extract the content from the response
             message_content = response.get("message", {}).get("content", "")
 
+            messages = user_message.split('\n')
+
+            # Find the last user message
+            last_user_message = ''
+            for msg in reversed(messages):
+                if msg.startswith('user:'):
+                    last_user_message = msg[len('user:'):].strip()
+                    break
+
             # Create and save the user message
             ChatMessage.objects.create(
-                thread=thread, sender="user", content=user_message
+                thread=thread, sender="user", content=last_user_message
             )
 
             # Create and save the bot response

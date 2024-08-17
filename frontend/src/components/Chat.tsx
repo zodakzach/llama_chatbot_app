@@ -99,7 +99,15 @@ const Chat: React.FC = () => {
       ]);
       setInput("");
 
-      createThreadAndSendMessageMutation.mutate(userMsg);
+      // Create a single string from the conversation history including the user's message
+      const context = [
+        ...messages,
+        { content: userMsg, sender: "user" } // Include the new user message
+      ]
+      .map((msg) => `${msg.sender}: ${msg.content}`)
+      .join('\n');
+
+      createThreadAndSendMessageMutation.mutate(context);
     }
   };
 
