@@ -14,34 +14,38 @@ interface DropdownButtonProps {
   onDelete: () => void;
 }
 
-const DropdownButton: React.FC<DropdownButtonProps> = ({ onRename, onDelete }) => {
+const DropdownButton: React.FC<DropdownButtonProps> = ({
+  onRename,
+  onDelete,
+}) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="p-2 text-gray-300 hover:text-white"
-            style={{
-                outline: 'none', // Removes the default focus outline
-              }}
-              onMouseDown={(e) => e.preventDefault()} // Prevents focus on click
+        <button
+          className="p-2 text-gray-300 hover:text-white"
+          style={{
+            outline: "none", // Removes the default focus outline
+          }}
+          onMouseDown={(e) => e.preventDefault()} // Prevents focus on click
         >
-            &#8230; {/* This is the Unicode for ellipsis */}
+          &#8230; {/* This is the Unicode for ellipsis */}
         </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
         sideOffset={5}
-        className="w-40 bg-white border border-gray-200 rounded shadow-lg p-1"
+        className="w-40 rounded border border-gray-200 bg-white p-1 shadow-lg"
       >
         <DropdownMenuItem
           onSelect={onRename}
-          className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+          className="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
         >
           Rename
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="h-px bg-gray-200 my-1" />
+        <DropdownMenuSeparator className="my-1 h-px bg-gray-200" />
         <DropdownMenuItem
           onSelect={onDelete}
-          className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+          className="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
         >
           Delete
         </DropdownMenuItem>
@@ -51,4 +55,3 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({ onRename, onDelete }) =
 };
 
 export default DropdownButton;
-

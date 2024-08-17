@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { login } from "../api/auth"; // Import the login function
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -14,7 +14,7 @@ const HomePage: React.FC = () => {
 
     if (result.success) {
       // Handle successful login (e.g., redirect to another page)
-      navigate('/chat');
+      navigate("/chat");
       // Redirect
     } else {
       setError(result.error ?? "An unexpected error occurred"); // Provide a fallback string

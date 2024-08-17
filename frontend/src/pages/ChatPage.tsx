@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Chat from "../components/Chat";
 import SideBar from "../components/SideBar";
 import { ChatProvider, useChatContext } from "../contexts/ChatContext";
@@ -15,27 +16,32 @@ const DefaultChatHandler: React.FC = () => {
     if (location.pathname === "/chat" && chatThreads.length === 0) {
       navigate("/chat/new");
     }
-  }, [chatThreads, location.pathname, navigate]);
+  }, [chatThreads.length, location.pathname, navigate]);
 
   return null;
 };
 
+// Create a client for React Query
+const queryClient = new QueryClient();
+
 function ChatPage() {
   return (
-    <ChatProvider>
-      <div className="flex">
-        <SideBar />
-        <div className="flex-1">
-          <DefaultChatHandler />
-          <Routes>
-            <Route path=":chatId" element={<Chat />} />
-            <Route path="new" element={<Chat />} />
-            {/* Redirect from root to 'new' if no chatId is present */}
-            <Route path="/" element={<Chat />} />
-          </Routes>
+    <QueryClientProvider client={queryClient}>
+      <ChatProvider>
+        <div className="flex">
+          <SideBar />
+          <div className="flex-1">
+            <DefaultChatHandler />
+            <Routes>
+              <Route path=":chatId" element={<Chat />} />
+              <Route path="new" element={<Chat />} />
+              {/* Redirect from root to 'new' if no chatId is present */}
+              <Route path="/" element={<Chat />} />
+            </Routes>
+          </div>
         </div>
-      </div>
-    </ChatProvider>
+      </ChatProvider>
+    </QueryClientProvider>
   );
 }
 

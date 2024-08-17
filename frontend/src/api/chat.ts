@@ -56,17 +56,14 @@ export const sendMessage = async (
   message: string,
 ): Promise<Message> => {
   try {
-    const response = await fetch(
-      `${API_URL}/chat/response/${threadId}/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message }),
-        credentials: "include",
+    const response = await fetch(`${API_URL}/chat/response/${threadId}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({ message }),
+      credentials: "include",
+    });
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -105,7 +102,9 @@ export const createNewThread = async (): Promise<string> => {
   }
 };
 
-export const fetchChatThreads = async (): Promise<{ threads: ChatThread[] }> => {
+export const fetchChatThreads = async (): Promise<{
+  threads: ChatThread[];
+}> => {
   try {
     const response = await fetch(`${API_URL}/chat/threads/`, {
       method: "GET",
@@ -124,53 +123,56 @@ export const fetchChatThreads = async (): Promise<{ threads: ChatThread[] }> => 
   }
 };
 
-export async function updateThreadTitle(threadId: number, newTitle: string): Promise<void> {
+export async function updateThreadTitle(
+  threadId: number,
+  newTitle: string,
+): Promise<void> {
   const url = `${API_URL}/chat/threads/${threadId}/update-title/`;
-  
+
   try {
-      const response = await fetch(url, {
-          method: 'PUT',
-          headers: {
-              'Content-Type': 'application/json',
-              // Add any other headers required by your backend, such as authentication tokens
-          },
-          credentials: "include", // Include credentials with the request
-          body: JSON.stringify({ title: newTitle }),
-      });
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // Add any other headers required by your backend, such as authentication tokens
+      },
+      credentials: "include", // Include credentials with the request
+      body: JSON.stringify({ title: newTitle }),
+    });
 
-      if (!response.ok) {
-          throw new Error(`Failed to update thread title: ${response.statusText}`);
-      }
+    if (!response.ok) {
+      throw new Error(`Failed to update thread title: ${response.statusText}`);
+    }
 
-      // Optionally handle the response here (e.g., confirm update, log success)
-      console.log('Thread title updated successfully.');
+    // Optionally handle the response here (e.g., confirm update, log success)
+    console.log("Thread title updated successfully.");
   } catch (error) {
-      // Handle errors here (e.g., show a user-friendly message)
-      console.error('Error updating thread title:', error);
+    // Handle errors here (e.g., show a user-friendly message)
+    console.error("Error updating thread title:", error);
   }
 }
 
 export async function deleteThread(threadId: number): Promise<void> {
   const url = `${API_URL}/chat/threads/${threadId}/delete/`;
-  
+
   try {
-      const response = await fetch(url, {
-          method: 'DELETE',
-          headers: {
-              'Content-Type': 'application/json',
-              // Add any other headers required by your backend, such as authentication tokens
-          },
-          credentials: "include", // Include credentials with the request
-      });
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        // Add any other headers required by your backend, such as authentication tokens
+      },
+      credentials: "include", // Include credentials with the request
+    });
 
-      if (!response.ok) {
-          throw new Error(`Failed to delete thread: ${response.statusText}`);
-      }
+    if (!response.ok) {
+      throw new Error(`Failed to delete thread: ${response.statusText}`);
+    }
 
-      // Optionally handle the response here (e.g., confirm deletion, log success)
-      console.log('Thread deleted successfully.');
+    // Optionally handle the response here (e.g., confirm deletion, log success)
+    console.log("Thread deleted successfully.");
   } catch (error) {
-      // Handle errors here (e.g., show a user-friendly message)
-      console.error('Error deleting thread:', error);
+    // Handle errors here (e.g., show a user-friendly message)
+    console.error("Error deleting thread:", error);
   }
 }

@@ -6,9 +6,9 @@ import {
   sendMessage,
   createNewThread,
   Message,
-  ChatThread,
 } from "../api/chat";
 import { useChatContext } from "../contexts/ChatContext";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -21,41 +21,71 @@ const Chat: React.FC = () => {
   const navigate = useNavigate();
   const { chatThreads, setChatThreads } = useChatContext();
   const location = useLocation();
+  const queryClient = useQueryClient();
 
-  // Scroll to the bottom of the chat when new messages are added
+  // Fetch messages
+  const { isLoading, isError, data, error } = useQuery({
+    queryKey: ["messages", chatId],
+    queryFn: () => fetchMessages(chatId!),
+    enabled: !!chatId && chatId !== "new", // Skip the query if chatId is 'new'
+  });
+
+  useEffect(() => {
+    if (data) {
+      setMessages(data.messages);
+      setIsThreadCreated(data.isThreadCreated);
+      setCurrentThreadId(data.currentThreadId);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (location.pathname === "/chat/new") {
+      setMessages([]);
+      setCurrentThreadId(null);
+      setIsThreadCreated(false);
+    }
+  }, [location.pathname]);
+
   useEffect(() => {
     if (endOfMessagesRef.current) {
       endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
-  useEffect(() => {
-    // Clear messages when navigating to /chat/new
-    if (location.pathname === "/chat/new") {
-      setMessages([]); // Clear messages
-      setCurrentThreadId(null);
-      setIsThreadCreated(false);
-    }
-  }, [location.pathname, setMessages]);
-
-  useEffect(() => {
-    const loadMessages = async () => {
-      if (chatId) {
-        // Ensure chatId is defined and not undefined
-        try {
-          const { messages, isThreadCreated, currentThreadId } =
-            await fetchMessages(chatId);
-          setMessages(messages);
-          setIsThreadCreated(isThreadCreated);
-          setCurrentThreadId(currentThreadId);
-        } catch (error) {
-          console.error("Failed to load messages:", error);
-        }
+  // Mutation for creating a new thread and sending a message
+  const createThreadAndSendMessageMutation = useMutation({
+    mutationFn: async (userMsg: string) => {
+      // If no thread is created, create a new one and send a message
+      if (!isThreadCreated) {
+        const threadId = await createNewThread();
+        const botMessage = await sendMessage(threadId, userMsg);
+        return { threadId, botMessage };
+      } else if (currentThreadId) {
+        // If a thread is already created, just send the message
+        const botMessage = await sendMessage(currentThreadId, userMsg);
+        return { threadId: currentThreadId, botMessage };
       }
-    };
-
-    loadMessages();
-  }, [chatId]);
+      throw new Error("No thread ID available");
+    },
+    onSuccess: ({ threadId, botMessage }) => {
+      if (!isThreadCreated) {
+        // Update state for new thread
+        setCurrentThreadId(threadId);
+        setIsThreadCreated(true);
+        setChatThreads((prevThreads) => [
+          ...prevThreads,
+          { id: Number(threadId), title: "New Chat" },
+        ]);
+        navigate(`/chat/${threadId}`);
+      }
+      // Update messages
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
+      setLoading(false);
+    },
+    onError: (error: Error) => {
+      console.error("Failed to handle chat:", error);
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,33 +99,7 @@ const Chat: React.FC = () => {
       ]);
       setInput("");
 
-      if (!isThreadCreated) {
-        try {
-          const threadId = await createNewThread();
-
-          const newThread: ChatThread = {
-            id: Number(threadId),
-            title: "New Chat",
-          };   
-          setCurrentThreadId(threadId);
-          setIsThreadCreated(true);
-          // Navigate to the newly created thread's route
-          const botMessage = await sendMessage(threadId, userMsg);
-          setMessages((prevMessages) => [...prevMessages, botMessage]);
-          setChatThreads((prevThreads) => [...prevThreads, newThread]);
-          navigate(`/chat/${threadId}`);
-        } catch (error) {
-          console.error("Failed to create chat thread:", error);
-        }
-      } else if (currentThreadId) {
-        try {
-          const botMessage = await sendMessage(currentThreadId, userMsg);
-          setMessages((prevMessages) => [...prevMessages, botMessage]);
-        } catch (error) {
-          console.error("Failed to send message:", error);
-        }
-      }
-      setLoading(false);
+      createThreadAndSendMessageMutation.mutate(userMsg);
     }
   };
 
