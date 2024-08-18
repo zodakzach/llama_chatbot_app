@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import {
   DropdownMenu,
@@ -10,13 +8,17 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 
 interface DropdownButtonProps {
-  onRename: () => void;
-  onDelete: () => void;
+  items: {
+    label?: string;
+    onClick?: () => void;
+    isSeparator?: boolean;
+  }[];
+  triggerContent: React.ReactNode;
 }
 
 const DropdownButton: React.FC<DropdownButtonProps> = ({
-  onRename,
-  onDelete,
+  items,
+  triggerContent,
 }) => {
   return (
     <DropdownMenu>
@@ -28,7 +30,7 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
           }}
           onMouseDown={(e) => e.preventDefault()} // Prevents focus on click
         >
-          &#8230; {/* This is the Unicode for ellipsis */}
+          {triggerContent}
         </button>
       </DropdownMenuTrigger>
 
@@ -36,19 +38,22 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
         sideOffset={5}
         className="w-40 rounded border border-gray-200 bg-white p-1 shadow-lg"
       >
-        <DropdownMenuItem
-          onSelect={onRename}
-          className="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-        >
-          Rename
-        </DropdownMenuItem>
-        <DropdownMenuSeparator className="my-1 h-px bg-gray-200" />
-        <DropdownMenuItem
-          onSelect={onDelete}
-          className="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-        >
-          Delete
-        </DropdownMenuItem>
+        {items.map((item, index) =>
+          item.isSeparator ? (
+            <DropdownMenuSeparator
+              key={index}
+              className="my-1 h-px bg-gray-200"
+            />
+          ) : (
+            <DropdownMenuItem
+              key={index}
+              onSelect={item.onClick}
+              className="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              {item.label}
+            </DropdownMenuItem>
+          ),
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

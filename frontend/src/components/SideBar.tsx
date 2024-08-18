@@ -88,11 +88,11 @@ const SideBar: React.FC = () => {
   return (
     <div className="flex">
       <div
-        className={`transition-all duration-300 ${isOpen ? "w-64" : "w-10"} h-screen bg-gray-800 text-white`}
+        className={`transition-all duration-300 ${isOpen ? "w-64" : "w-10"} h-screen bg-gray-900 text-white`}
       >
         <div className="flex justify-between">
           <button
-            className="bg-gray-800 p-2 text-white"
+            className="ml-2 mt-1 rounded-lg bg-gray-900 p-1 text-white hover:bg-gray-700"
             onClick={toggleSidebar}
           >
             {isOpen ? (
@@ -102,7 +102,10 @@ const SideBar: React.FC = () => {
             )}
           </button>
           {isOpen && (
-            <button onClick={handleNewChat} className={`px-4 py-2`}>
+            <button
+              onClick={handleNewChat}
+              className="mr-2 mt-1 rounded-lg p-1 hover:bg-gray-700"
+            >
               <img src={newChatIcon} alt="New Chat Icon" />
             </button>
           )}

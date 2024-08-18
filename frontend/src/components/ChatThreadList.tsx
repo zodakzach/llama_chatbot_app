@@ -71,8 +71,12 @@ const ChatThreadsList: React.FC<ChatThreadsListProps> = ({
               </span>
             )}
             <DropdownButton
-              onRename={() => handleRename(thread.id)}
-              onDelete={() => onDelete(thread.id)}
+              triggerContent={<span>&#8230;</span>} // Custom trigger content
+              items={[
+                { label: "Rename", onClick: () => handleRename(thread.id) },
+                { isSeparator: true }, // Adds a separator
+                { label: "Delete", onClick: () => onDelete(thread.id) },
+              ]}
             />
           </NavLink>
         </li>
