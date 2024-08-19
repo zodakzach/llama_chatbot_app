@@ -20,6 +20,7 @@ import remarkGfm from "remark-gfm"; // For GitHub Flavored Markdown (tables, str
 import sendIcon from "../assets/images/arrow-up-circle.svg";
 import profileIcon from "../assets/images/person-circle.svg";
 import DropdownButton from "./DropdownButton";
+import { logout } from '../api/auth'; // Import the logout function from the auth file
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -144,12 +145,12 @@ const Chat: React.FC = () => {
         <h1 className="text-xl font-bold text-white">Llama 3.1</h1>
         <DropdownButton
           triggerContent={
-            <img src={profileIcon} alt="Profile Icon" className="h-7 w-7" />
+            <img src={profileIcon} alt="Profile Icon" className="h-7 w-7 hover:bg-gray-500 rounded-full" />
           } // Custom trigger content
           items={[
             { label: "Settings", onClick: () => console.log("Action 2") },
             { isSeparator: true },
-            { label: "Logout", onClick: () => console.log("Another Action") },
+            { label: "Logout", onClick: () => logout(navigate) },
           ]}
         />
       </div>
