@@ -20,9 +20,6 @@ const DefaultChatHandler: React.FC = () => {
   return null;
 };
 
-// Create a client for React Query
-//const queryClient = new QueryClient();
-
 function ChatPage() {
   return (
     <ChatProvider>
