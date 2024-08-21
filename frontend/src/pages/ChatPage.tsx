@@ -23,7 +23,7 @@ const DefaultChatHandler: React.FC = () => {
 function ChatPage() {
   return (
     <ChatProvider>
-      <div className="flex">
+      <div className="flex h-screen">
         <SideBar />
         <div className="flex-1">
           <DefaultChatHandler />

@@ -139,9 +139,9 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-full flex-col">
       {/* Full-Width Sticky Bar */}
-      <div className="fixed top-0 z-10 flex w-full items-center justify-between bg-gray-800 p-4">
+      <div className="fixed top-0 z-10 flex w-[calc(100%-16rem)] items-center justify-between bg-gray-800 p-4">
         <h1 className="text-xl font-bold text-white">Llama 3.1</h1>
         <DropdownButton
           triggerContent={

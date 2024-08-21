@@ -160,4 +160,4 @@ CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SECURE = False  # Use True if you are using HTTPS
 # In Django settings.py
 SESSION_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SECURE = False  # Only if using HTTPS
+SESSION_COOKIE_SECURE = True  # Only if using HTTPS
