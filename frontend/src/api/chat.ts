@@ -176,3 +176,34 @@ export async function deleteThread(threadId: number): Promise<void> {
     console.error("Error deleting thread:", error);
   }
 }
+
+export async function deleteAllThreads(): Promise<void> {
+  const url = `${API_URL}/chat/threads/delete/`;
+
+  try {
+    // Send POST request to delete all threads
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        // Add any other headers required by your backend, such as authentication tokens
+      },
+      credentials: "include", // Include credentials with the request
+    });
+
+    // Check if the response is ok (status code 200-299)
+    if (!response.ok) {
+      // Throw an error with the status text if the response is not ok
+      throw new Error(`Failed to delete all threads: ${response.statusText}`);
+    }
+
+    // Optionally handle the response here (e.g., confirm deletion, update UI)
+    console.log("All threads deleted successfully.");
+    // For example, you might want to refresh the list of threads here
+
+  } catch (error) {
+    // Handle errors here (e.g., show a user-friendly message)
+    console.error("Error deleting all threads:", error);
+  }
+}
+

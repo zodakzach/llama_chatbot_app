@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import { useChatContext } from "../contexts/ChatContext";
-import { fetchChatThreads, updateThreadTitle, deleteThread } from "../api/chat";
+import { fetchChatThreads, updateThreadTitle, deleteThread, deleteAllThreads } from "../api/chat";
 import ChatThreadsList from "./ChatThreadList";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import newChatIcon from "../assets/images/new_chat_icon.svg";
+import { ClearChatsDialog } from "./ClearChatsDialog";
 
 const SideBar: React.FC = () => {
   const { chatThreads, setChatThreads } = useChatContext();
@@ -65,6 +66,20 @@ const SideBar: React.FC = () => {
     }
   };
 
+  const handleDeleteAll = async () => {
+    // Optionally clear the chat threads from the UI
+    setChatThreads([]);
+  
+    try {
+      // Call the function to delete all threads on the server
+      await deleteAllThreads();
+      navigate("/chat/new"); // Navigate to a different page or refresh the current page
+    } catch (error) {
+      // Handle errors and possibly revert the UI update if needed
+      console.error("Error deleting all threads:", error);
+    }
+  };
+
   // Navigate to create a new chat
   const handleNewChat = () => {
     navigate("/chat/new");
@@ -75,7 +90,7 @@ const SideBar: React.FC = () => {
       <div
         className='w-64 bg-gray-900 text-white'
       >
-        <div className="p-4">
+        <div className="p-4 flex flex-col flex-grow">
           <div className="flex justify-between">
             <h2 className="p-2 text-xl font-bold">Chat Logs</h2>
             <button
@@ -94,12 +109,15 @@ const SideBar: React.FC = () => {
               <p className="text-red-500 mt-4">Error: {error.message}</p>
             </div>
           ) : (
-            <ChatThreadsList
-              chatThreads={chatThreads}
-              onRename={handleRename}
-              onDelete={handleDelete}
-            />
+            <div className="flex-grow overflow-y-auto max-h-[calc(100vh-120px)] min-h-[calc(100vh-120px)]">
+              <ChatThreadsList
+                chatThreads={chatThreads}
+                onRename={handleRename}
+                onDelete={handleDelete}
+              />
+          </div>
           )}
+          <ClearChatsDialog handleDeleteAll={handleDeleteAll} />
         </div>
       </div>
     </div>

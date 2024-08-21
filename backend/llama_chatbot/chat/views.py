@@ -71,17 +71,39 @@ def chat_with_model(request, thread_id):
             # Retrieve the chat thread
             thread = get_object_or_404(ChatThread, id=int(thread_id), user=request.user)
 
-            client = Client(host="http://localhost:11434")
+            try:
+                # Initialize the Client
+                client = Client(host="http://localhost:11434")
 
-            # Get the response from the model
-            response = client.chat(
-                model="llama3.1", messages=[{"role": "user", "content": context_str}]
-            )
+                try:
+                    # Get the response from the model
+                    response = client.chat(
+                        model="llama3.1", messages=[{"role": "user", "content": context_str}]
+                    )
+                    print(response)
 
-            # Extract the content from the response
-            message_content = response.get("message", {}).get("content", "")
+                    # Check if response is valid and extract the content
+                    if isinstance(response, dict) and "message" in response:
+                        message_content = response["message"].get("content", "")
+                    else:
+                        print("Unexpected response format:", response)
+                        message_content = ""
 
-            messages = user_message.split("\n")
+                except Exception as e:
+                    print("Error during API request:", str(e))
+                    message_content = ""
+
+            except Exception as e:
+                print("Error initializing the Client:", str(e))
+                message_content = ""
+
+            # Safely handle user_message
+            if isinstance(user_message, str):
+                messages = user_message.split("\n")
+            else:
+                print("Error: user_message is not a string or is undefined")
+                messages = []
+
 
             # Find the last user message
             last_user_message = ""
@@ -198,5 +220,21 @@ def delete_thread(request, thread_id):
         thread.delete()
 
         return JsonResponse({"status": "Thread deleted successfully"}, status=200)
+
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+
+@login_required
+@csrf_exempt
+def delete_all_threads(request):
+    if request.method == "DELETE":
+        # Retrieve all chat threads for the current user
+        threads = ChatThread.objects.filter(user=request.user)
+        
+        # Delete all retrieved chat threads
+        thread_count = threads.count()
+        threads.delete()
+
+        return JsonResponse({"status": f"Successfully deleted {thread_count} threads"}, status=200)
 
     return JsonResponse({"error": "Method not allowed"}, status=405)

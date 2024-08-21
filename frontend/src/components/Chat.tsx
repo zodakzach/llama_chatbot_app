@@ -64,6 +64,62 @@ const Chat: React.FC = () => {
     }
   }, [messages]);
 
+  const createThreadMutation = useMutation({
+    mutationFn: async () => {
+      // Create a new thread and return the thread ID
+      const threadId = await createNewThread();
+      return threadId;
+    },
+    onSuccess: (threadId) => {
+      // Update state for new thread
+      setIsThreadCreated(true);
+      setCurrentThreadId(threadId);
+      setChatThreads((prevThreads) => [
+        ...prevThreads,
+        { id: Number(threadId), title: "New Chat" },
+      ]);
+      navigate(`/chat/${threadId}`);
+    },
+    onError: (error: Error) => {
+      console.error("Failed to create thread:", error);
+      setIsThreadCreated(false);
+    },
+  });
+
+  const sendMessageMutation = useMutation({
+    mutationFn: async ({ threadId, userMsg }: { threadId: string; userMsg: string }) => {
+      // Send a message to the specified thread and return the bot's response
+      const botMessage = await sendMessage(threadId, userMsg);
+      return botMessage;
+    },
+    onSuccess: (botMessage) => {
+      // Update messages
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
+      setLoading(false);
+    },
+    onError: (error: Error) => {
+      console.error("Failed to send message:", error);
+    },
+  });
+  
+  const handleCreateThreadAndSendMessage = async (userMsg: string) => {
+    try {
+      if (!isThreadCreated) {
+        // Create a new thread
+        const threadId = await createThreadMutation.mutateAsync();
+        // Send a message to the newly created thread
+        await sendMessageMutation.mutateAsync({ threadId, userMsg });
+      } else if (currentThreadId) {
+        // Send a message to the existing thread
+        await sendMessageMutation.mutateAsync({ threadId: currentThreadId, userMsg });
+      } else {
+        throw new Error("No thread ID available");
+      }
+    } catch (error) {
+      console.error("Failed to handle chat:", error);
+    }
+  };  
+
   // Mutation for creating a new thread and sending a message
   const createThreadAndSendMessageMutation = useMutation({
     mutationFn: async (userMsg: string) => {
@@ -82,8 +138,8 @@ const Chat: React.FC = () => {
     onSuccess: ({ threadId, botMessage }) => {
       if (!isThreadCreated) {
         // Update state for new thread
-        setCurrentThreadId(threadId);
         setIsThreadCreated(true);
+        setCurrentThreadId(threadId);
         setChatThreads((prevThreads) => [
           ...prevThreads,
           { id: Number(threadId), title: "New Chat" },
@@ -96,6 +152,7 @@ const Chat: React.FC = () => {
     },
     onError: (error: Error) => {
       console.error("Failed to handle chat:", error);
+      setIsThreadCreated(false);
     },
   });
 
@@ -119,7 +176,7 @@ const Chat: React.FC = () => {
         .map((msg) => `${msg.sender}: ${msg.content}`)
         .join("\n");
 
-      createThreadAndSendMessageMutation.mutate(context);
+      handleCreateThreadAndSendMessage(context);
     }
   };
 
@@ -156,7 +213,21 @@ const Chat: React.FC = () => {
       </div>
       <div className="mx-auto mt-16 flex h-full w-3/5 flex-col overflow-hidden">
         <div className="w-full flex-1 overflow-auto p-4">
-          {messages.length === 0 ? (
+          {isLoading ? (
+          <div className="flex h-full flex-col items-center justify-center">
+            <div role="status">
+              <svg aria-hidden="true" className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                  <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+              </svg>
+            </div>
+            <p className="text-gray-500">Loading messages...</p>
+          </div>
+        ) : isError ? (
+          <div className="flex h-full flex-col items-center justify-center">
+            <p className="text-red-500">Error loading messages: {error.message}</p>
+          </div>
+        ) : messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center">
               <img src={ollama_icon} className="h-20 w-20 rounded-full p-4" />
               <p className="text-gray-500">
