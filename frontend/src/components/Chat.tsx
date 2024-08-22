@@ -39,7 +39,9 @@ const Chat: React.FC = () => {
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ["messages", chatId],
     queryFn: () => fetchMessages(chatId!),
-    enabled: !!chatId && chatId !== "new", // Skip the query if chatId is 'new'
+    enabled: !!chatId && chatId !== "new" && !loading, // Skip the query if chatId is 'new'
+    refetchOnWindowFocus: false, // Avoid refetching on window focus
+    refetchOnReconnect: false,  // Avoid refetching on reconnect
   });
 
   useEffect(() => {
@@ -68,12 +70,10 @@ const Chat: React.FC = () => {
     mutationFn: async () => {
       // Create a new thread and return the thread ID
       const threadId = await createNewThread();
-      return threadId;
+      return { threadId }; // Return both threadId and userMsg
     },
-    onSuccess: (threadId) => {
+    onSuccess: ({threadId }) => {
       // Update state for new thread
-      setIsThreadCreated(true);
-      setCurrentThreadId(threadId);
       setChatThreads((prevThreads) => [
         ...prevThreads,
         { id: Number(threadId), title: "New Chat" },
@@ -102,59 +102,28 @@ const Chat: React.FC = () => {
     },
   });
   
-  const handleCreateThreadAndSendMessage = async (userMsg: string) => {
+  const handleCreateThreadAndSendMessage = async (userMsg: string, context: string) => {
     try {
+      let threadId = currentThreadId;
       if (!isThreadCreated) {
         // Create a new thread
-        const threadId = await createThreadMutation.mutateAsync();
-        // Send a message to the newly created thread
-        await sendMessageMutation.mutateAsync({ threadId, userMsg });
-      } else if (currentThreadId) {
-        // Send a message to the existing thread
-        await sendMessageMutation.mutateAsync({ threadId: currentThreadId, userMsg });
-      } else {
-        throw new Error("No thread ID available");
+        const { threadId: newThreadId } = await createThreadMutation.mutateAsync();
+        threadId = newThreadId; // Update threadId with the newly created thread's ID
+        setIsThreadCreated(true);
+        setCurrentThreadId(threadId);
+      }
+      if (threadId) {
+        // Add the new user message to the local state
+        const msg: Message = { content: userMsg, sender: "user" };
+        setMessages((prevMessages) => [...prevMessages, msg]);
+
+        // Send the message to the thread
+        await sendMessageMutation.mutateAsync({ threadId, userMsg: context });
       }
     } catch (error) {
       console.error("Failed to handle chat:", error);
     }
-  };  
-
-  // Mutation for creating a new thread and sending a message
-  const createThreadAndSendMessageMutation = useMutation({
-    mutationFn: async (userMsg: string) => {
-      // If no thread is created, create a new one and send a message
-      if (!isThreadCreated) {
-        const threadId = await createNewThread();
-        const botMessage = await sendMessage(threadId, userMsg);
-        return { threadId, botMessage };
-      } else if (currentThreadId) {
-        // If a thread is already created, just send the message
-        const botMessage = await sendMessage(currentThreadId, userMsg);
-        return { threadId: currentThreadId, botMessage };
-      }
-      throw new Error("No thread ID available");
-    },
-    onSuccess: ({ threadId, botMessage }) => {
-      if (!isThreadCreated) {
-        // Update state for new thread
-        setIsThreadCreated(true);
-        setCurrentThreadId(threadId);
-        setChatThreads((prevThreads) => [
-          ...prevThreads,
-          { id: Number(threadId), title: "New Chat" },
-        ]);
-        navigate(`/chat/${threadId}`);
-      }
-      // Update messages
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
-      setLoading(false);
-    },
-    onError: (error: Error) => {
-      console.error("Failed to handle chat:", error);
-      setIsThreadCreated(false);
-    },
-  });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,10 +131,6 @@ const Chat: React.FC = () => {
       setLoading(true);
 
       const userMsg = input;
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { content: userMsg, sender: "user" },
-      ]);
       setInput("");
 
       // Create a single string from the conversation history including the user's message
@@ -176,7 +141,7 @@ const Chat: React.FC = () => {
         .map((msg) => `${msg.sender}: ${msg.content}`)
         .join("\n");
 
-      handleCreateThreadAndSendMessage(context);
+      handleCreateThreadAndSendMessage(userMsg, context);
     }
   };
 

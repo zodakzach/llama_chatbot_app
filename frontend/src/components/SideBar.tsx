@@ -15,6 +15,8 @@ const SideBar: React.FC = () => {
   const { data, error, isLoading } = useQuery({
     queryKey: ["chatThreads"],
     queryFn: fetchChatThreads,
+    refetchOnWindowFocus: false, // Avoid refetching on window focus
+    refetchOnReconnect: false,  // Avoid refetching on reconnect
   });
 
   // Effect to handle side effects and update chat threads state
