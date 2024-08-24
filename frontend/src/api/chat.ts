@@ -207,3 +207,62 @@ export async function deleteAllThreads(): Promise<void> {
   }
 }
 
+export interface SendMessageParams {
+  threadId: string;
+  message: string;
+  signal: AbortSignal;
+  onMessageUpdate: (content: string) => void;
+}
+
+export const sendMessageStream = async ({
+  threadId,
+  message,
+  signal,
+  onMessageUpdate
+}: SendMessageParams): Promise<void> => {
+  try {
+    const response = await fetch(`${API_URL}/chat/streaming-response/${threadId}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message }),
+      credentials: "include",
+      signal, // Pass the AbortSignal to the fetch request
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error("Failed to get reader from response body");
+    }
+
+    const decoder = new TextDecoder();
+    let content = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      content += chunk;
+
+      onMessageUpdate(content); // Notify the UI about the new content
+    }
+
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        console.log('Streaming cancelled.');
+      } else {
+        console.error('Failed to send message:', error.message);
+      }
+    } else {
+      console.error('An unknown error occurred:', error);
+    }
+    throw error;
+  }
+};

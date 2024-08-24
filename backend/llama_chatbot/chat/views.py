@@ -1,13 +1,13 @@
 from django.http import JsonResponse, StreamingHttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_GET
-import ollama
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import ChatThread, ChatMessage
 from django.shortcuts import get_object_or_404
 from ollama import Client
-from .utils import truncate_context
+from . import ollama_utils
+import threading
 
 
 @login_required
@@ -15,6 +15,8 @@ from .utils import truncate_context
 @csrf_exempt
 def chat_with_model_stream(request, thread_id):
     if request.method == "POST":
+        cancellation_event = threading.Event()  # Per-request cancellation event
+
         try:
             data = json.loads(request.body)
             user_message = data.get("message")
@@ -22,37 +24,32 @@ def chat_with_model_stream(request, thread_id):
             if not user_message:
                 return JsonResponse({"error": "No message provided"}, status=400)
 
-            # Retrieve the chat thread
-            thread = get_object_or_404(ChatThread, id=thread_id, user=request.user)
+            context_str = ollama_utils.truncate_context(user_message)
 
-            # Create and save the user message
-            ChatMessage.objects.create(
-                thread=thread, sender="user", content=user_message
-            )
+            # Retrieve the chat thread 
+            thread = ollama_utils.get_thread(thread_id, request.user)
 
-            # Define the generator to stream the response
-            def stream_response():
-                stream = ollama.chat(
-                    model="llama3.1",
-                    messages=[{"role": "user", "content": user_message}],
-                    stream=True,
-                )
-                for chunk in stream:
-                    message_content = chunk["message"]["content"]
-                    # Save the bot's response as it arrives
-                    ChatMessage.objects.create(
-                        thread=thread, sender="bot", content=message_content
-                    )
-                    yield message_content
+            # Save the user message
+            ollama_utils.save_user_message(thread, user_message)
 
-            # Create and return the streaming response
-            return StreamingHttpResponse(stream_response(), content_type="text/plain")
+            # Create a generator to stream the response
+            response_generator = ollama_utils.stream_response(request, model_name="llama3.1", message={"role": "user", "content": context_str}, thread=thread, cancellation_event=cancellation_event)
+
+            # Return a StreamingHttpResponse to stream data back to the client
+            response = StreamingHttpResponse(response_generator, content_type='text/plain')
+            response['Cache-Control'] = 'no-cache'
+            return response
 
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON"}, status=400)
+        except (ConnectionError, BrokenPipeError) as e:
+            print(f"Connection error occurred: {e}")
+            return JsonResponse({"error": "Connection error occurred"}, status=500)
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return JsonResponse({"error": "An unexpected error occurred"}, status=500)
 
     return JsonResponse({"error": "Method not allowed"}, status=405)
-
 
 @login_required
 @require_POST
@@ -66,10 +63,13 @@ def chat_with_model(request, thread_id):
             if not user_message:
                 return JsonResponse({"error": "No message provided"}, status=400)
 
-            context_str = truncate_context(user_message)
+            context_str = ollama_utils.truncate_context(user_message)
 
             # Retrieve the chat thread
             thread = get_object_or_404(ChatThread, id=int(thread_id), user=request.user)
+
+            # Save the user message
+            ollama_utils.save_user_message(thread, user_message)
 
             try:
                 # Initialize the Client
@@ -80,7 +80,6 @@ def chat_with_model(request, thread_id):
                     response = client.chat(
                         model="llama3.1", messages=[{"role": "user", "content": context_str}]
                     )
-                    print(response)
 
                     # Check if response is valid and extract the content
                     if isinstance(response, dict) and "message" in response:
@@ -96,26 +95,6 @@ def chat_with_model(request, thread_id):
             except Exception as e:
                 print("Error initializing the Client:", str(e))
                 message_content = ""
-
-            # Safely handle user_message
-            if isinstance(user_message, str):
-                messages = user_message.split("\n")
-            else:
-                print("Error: user_message is not a string or is undefined")
-                messages = []
-
-
-            # Find the last user message
-            last_user_message = ""
-            for msg in reversed(messages):
-                if msg.startswith("user:"):
-                    last_user_message = msg[len("user:") :].strip()
-                    break
-
-            # Create and save the user message
-            ChatMessage.objects.create(
-                thread=thread, sender="user", content=last_user_message
-            )
 
             # Create and save the bot response
             ChatMessage.objects.create(

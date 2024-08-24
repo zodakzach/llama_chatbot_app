@@ -11,7 +11,9 @@ import {
   fetchMessages,
   sendMessage,
   createNewThread,
+  sendMessageStream,
   Message,
+  SendMessageParams
 } from "../api/chat";
 import { useChatContext } from "../contexts/ChatContext";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
@@ -21,6 +23,7 @@ import sendIcon from "../assets/images/arrow-up-circle.svg";
 import profileIcon from "../assets/images/person-circle.svg";
 import DropdownButton from "./DropdownButton";
 import { logout } from '../api/auth'; // Import the logout function from the auth file
+import { useSendMessage } from '../hooks/useSendMessage';
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -34,6 +37,8 @@ const Chat: React.FC = () => {
   const { chatThreads, setChatThreads } = useChatContext();
   const location = useLocation();
   const queryClient = useQueryClient();
+  const [abortController, setAbortController] = useState<AbortController | null>(null); // State to manage abort controller
+  const { mutate: sendMessage, isPending: sendMessageLoading } = useSendMessage();
 
   // Fetch messages
   const { isLoading, isError, data, error } = useQuery({
@@ -66,6 +71,18 @@ const Chat: React.FC = () => {
     }
   }, [messages]);
 
+  useEffect(() => {
+    // Abort ongoing request when location changes
+    return () => {
+      if (abortController) {
+        abortController.abort();
+        console.log("Cancelled request")
+        setLoading(false);
+      }
+    };
+  }, [location, abortController]);
+
+
   const createThreadMutation = useMutation({
     mutationFn: async () => {
       // Create a new thread and return the thread ID
@@ -86,22 +103,7 @@ const Chat: React.FC = () => {
     },
   });
 
-  const sendMessageMutation = useMutation({
-    mutationFn: async ({ threadId, userMsg }: { threadId: string; userMsg: string }) => {
-      // Send a message to the specified thread and return the bot's response
-      const botMessage = await sendMessage(threadId, userMsg);
-      return botMessage;
-    },
-    onSuccess: (botMessage) => {
-      // Update messages
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
-      setLoading(false);
-    },
-    onError: (error: Error) => {
-      console.error("Failed to send message:", error);
-    },
-  });
-  
+
   const handleCreateThreadAndSendMessage = async (userMsg: string, context: string) => {
     try {
       let threadId = currentThreadId;
@@ -117,8 +119,49 @@ const Chat: React.FC = () => {
         const msg: Message = { content: userMsg, sender: "user" };
         setMessages((prevMessages) => [...prevMessages, msg]);
 
-        // Send the message to the thread
-        await sendMessageMutation.mutateAsync({ threadId, userMsg: context });
+        // Create an abort controller for this request
+        const controller = new AbortController();
+        setAbortController(controller);
+
+        const params: SendMessageParams = {
+          threadId: threadId,
+          message: context,
+          signal: controller.signal,
+          onMessageUpdate: (newContent: string) => {
+            setMessages((prevMessages) => {
+              // Find the last message
+              const updatedMessages = [...prevMessages];
+              const lastMessage = updatedMessages[updatedMessages.length - 1];
+              
+              if (lastMessage && lastMessage.sender === "bot") {
+                // Update the content of the last message
+                lastMessage.content = newContent;
+                updatedMessages[updatedMessages.length - 1] = lastMessage;
+              } else {
+                // Add a new bot message if needed
+                updatedMessages.push({ content: newContent, sender: "bot" });
+              }
+  
+              return updatedMessages;
+            });          
+          },
+        };
+
+        // Start the mutation and handle success directly
+        sendMessage(params, {
+          onSuccess: () => {
+            // Actions to perform on success
+            console.log('Message sent successfully.');
+            setAbortController(null);
+            setLoading(false);
+          },
+          onError: () => {
+            // Actions to perform on error
+            setAbortController(null);
+            setLoading(false);
+          },
+        });
+
       }
     } catch (error) {
       console.error("Failed to handle chat:", error);
