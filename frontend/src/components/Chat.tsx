@@ -9,9 +9,7 @@ import ollama_icon from "../assets/images/ollama_icon.png";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   fetchMessages,
-  sendMessage,
   createNewThread,
-  sendMessageStream,
   Message,
   SendMessageParams
 } from "../api/chat";
@@ -24,6 +22,7 @@ import profileIcon from "../assets/images/person-circle.svg";
 import DropdownButton from "./DropdownButton";
 import { logout } from '../api/auth'; // Import the logout function from the auth file
 import { useSendMessage } from '../hooks/useSendMessage';
+import stopIcon from "../assets/images/stop-fill.svg";
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -203,6 +202,14 @@ const Chat: React.FC = () => {
     }
   };
 
+  const handleStop = (): void => {
+    if (abortController) {
+      abortController.abort();
+      console.log("Cancelled request")
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="flex h-full flex-col">
       {/* Full-Width Sticky Bar */}
@@ -219,8 +226,9 @@ const Chat: React.FC = () => {
           ]}
         />
       </div>
-      <div className="mx-auto mt-16 flex h-full w-3/5 flex-col overflow-hidden">
-        <div className="w-full flex-1 overflow-auto p-4">
+      <div className="mx-auto mt-16 flex h-full w-full flex-col overflow-hidden">
+        <div className="flex overflow-auto p-4 justify-center h-full">
+          <div className="w-3/5 h-full">
           {isLoading ? (
           <div className="flex h-full flex-col items-center justify-center">
             <div role="status">
@@ -231,11 +239,11 @@ const Chat: React.FC = () => {
             </div>
             <p className="text-gray-500">Loading messages...</p>
           </div>
-        ) : isError ? (
+          ) : isError ? (
           <div className="flex h-full flex-col items-center justify-center">
             <p className="text-red-500">Error loading messages: {error.message}</p>
           </div>
-        ) : messages.length === 0 ? (
+          ) : messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center">
               <img src={ollama_icon} className="h-20 w-20 rounded-full p-4" />
               <p className="text-gray-500">
@@ -311,8 +319,10 @@ const Chat: React.FC = () => {
               <div ref={endOfMessagesRef} />
             </div>
           )}
+          </div>
         </div>
-        <form onSubmit={handleSubmit} className="relative mb-5 p-4">
+        <div className="flex justify-center w-full">
+        <form onSubmit={handleSubmit} className="relative mb-5 p-4 w-3/5">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -327,14 +337,25 @@ const Chat: React.FC = () => {
             }}
             onKeyDown={handleKeyDown}
           ></textarea>
-          <button
-            type="submit"
-            className="absolute bottom-7 right-5 rounded-full bg-white hover:bg-gray-300 disabled:bg-gray-400"
-            disabled={loading || input.trim() === ""} // Disable button when loading
-          >
-            <img src={sendIcon} alt="Send Icon" />
-          </button>
+          {loading ? (
+            <button
+              type="button" // Use button type instead of submit to prevent form submission
+              className="absolute bottom-7 right-5 rounded-full bg-white hover:bg-gray-300"
+              onClick={handleStop}// Replace with your stop action handler
+            >
+              <img src={stopIcon} alt="Stop Icon" className="w-8 h-8"/>
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="absolute bottom-7 right-5 rounded-full bg-white hover:bg-gray-300 disabled:bg-gray-400"
+              disabled={input.trim() === ""} // Disable button only based on input
+            >
+              <img src={sendIcon} alt="Send Icon" className="w-8 h-8"/>
+            </button>
+          )}
         </form>
+        </div>
       </div>
     </div>
   );
