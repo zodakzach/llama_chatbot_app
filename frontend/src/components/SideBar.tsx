@@ -1,6 +1,11 @@
 import React, { useEffect } from "react";
 import { useChatContext } from "../contexts/ChatContext";
-import { fetchChatThreads, updateThreadTitle, deleteThread, deleteAllThreads } from "../api/chat";
+import {
+  fetchChatThreads,
+  updateThreadTitle,
+  deleteThread,
+  deleteAllThreads,
+} from "../api/chat";
 import ChatThreadsList from "./ChatThreadList";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -16,7 +21,8 @@ const SideBar: React.FC = () => {
     queryKey: ["chatThreads"],
     queryFn: fetchChatThreads,
     refetchOnWindowFocus: false, // Avoid refetching on window focus
-    refetchOnReconnect: false,  // Avoid refetching on reconnect
+    refetchOnReconnect: false, // Avoid refetching on reconnect
+    refetchInterval: false, // Disable periodic refetching
   });
 
   // Effect to handle side effects and update chat threads state
@@ -71,7 +77,7 @@ const SideBar: React.FC = () => {
   const handleDeleteAll = async () => {
     // Optionally clear the chat threads from the UI
     setChatThreads([]);
-  
+
     try {
       // Call the function to delete all threads on the server
       await deleteAllThreads();
@@ -89,35 +95,33 @@ const SideBar: React.FC = () => {
 
   return (
     <div className="flex h-screen">
-      <div
-        className='w-64 bg-gray-900 text-white'
-      >
-        <div className="p-4 flex flex-col flex-grow">
+      <div className="w-64 bg-gray-900 text-white">
+        <div className="flex flex-grow flex-col p-4">
           <div className="flex justify-between">
             <h2 className="p-2 text-xl font-bold">Chat Logs</h2>
             <button
-                onClick={handleNewChat}
-                className="rounded-lg p-2 hover:bg-gray-700"
-              >
-                <img src={newChatIcon} alt="New Chat Icon" />
+              onClick={handleNewChat}
+              className="rounded-lg p-2 hover:bg-gray-700"
+            >
+              <img src={newChatIcon} alt="New Chat Icon" />
             </button>
           </div>
           {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-gray-400 mt-4">Loading threads...</p>
+            <div className="flex max-h-[calc(100vh-120px)] min-h-[calc(100vh-120px)] items-center justify-center">
+              <p className="mt-4 text-gray-400">Loading threads...</p>
             </div>
           ) : error ? (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-red-500 mt-4">Error: {error.message}</p>
+            <div className="flex max-h-[calc(100vh-120px)] min-h-[calc(100vh-120px)] items-center justify-center">
+              <p className="mt-4 text-red-500">Error: {error.message}</p>
             </div>
           ) : (
-            <div className="flex-grow overflow-y-auto max-h-[calc(100vh-120px)] min-h-[calc(100vh-120px)]">
+            <div className="max-h-[calc(100vh-120px)] min-h-[calc(100vh-120px)] flex-grow overflow-y-auto">
               <ChatThreadsList
                 chatThreads={chatThreads}
                 onRename={handleRename}
                 onDelete={handleDelete}
               />
-          </div>
+            </div>
           )}
           <ClearChatsDialog handleDeleteAll={handleDeleteAll} />
         </div>

@@ -1,8 +1,18 @@
 from ollama import Client
 from .models import ChatMessage, ChatThread
+from django.shortcuts import get_object_or_404
+from django.http import Http404
+from pathlib import Path
+from dotenv import load_dotenv
+import os
 
-# Define the host URL as a constant
-OLLAMA_HOST = "http://localhost:11434"
+# Load the .env file
+env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
+
+# Use the environment variable
+OLLAMA_HOST = os.getenv("OLLAMA_HOST")
+
 
 def truncate_context(context_str):
     """
@@ -36,13 +46,13 @@ def initialize_client():
     except Exception as e:
         print("Error initializing the Client:", str(e))
         return None
-    
+
 
 def stream_response(request, model_name, message, thread, cancellation_event):
-    client = initialize_client()  # Ensure this is awaited if asynchronous
+    client = initialize_client() 
     if client is None:
         return
-    
+
     response = ""  # Store the partial response here
 
     def stream():
@@ -52,16 +62,20 @@ def stream_response(request, model_name, message, thread, cancellation_event):
                 if cancellation_event.is_set():
                     print("Streaming cancelled.")
                     break
-                response += part['message']['content']
-                yield part['message']['content']
+                response += part["message"]["content"]
+                yield part["message"]["content"]
         except Exception as e:
             print(f"Streaming error: {e}")
             if response:
-                ChatMessage.objects.create(thread=thread, sender="bot", content=response)
+                ChatMessage.objects.create(
+                    thread=thread, sender="bot", content=response
+                )
             raise
         else:
             if response:
-                ChatMessage.objects.create(thread=thread, sender="bot", content=response)
+                ChatMessage.objects.create(
+                    thread=thread, sender="bot", content=response
+                )
 
     return stream()
 
@@ -69,12 +83,12 @@ def stream_response(request, model_name, message, thread, cancellation_event):
 def save_user_message(thread, user_message):
     """
     Saves the user message to the ChatMessage model.
-    
+
     Parameters:
     thread (ChatThread): The chat thread where the messages should be saved.
     user_message (str): The user's input message containing both user and bot content.
     """
-    
+
     # Safely handle user_message
     if isinstance(user_message, str):
         messages = user_message.split("\n")
@@ -89,12 +103,8 @@ def save_user_message(thread, user_message):
             last_user_message = msg[len("user:") :].strip()
             break
 
-    ChatMessage.objects.create(
-        thread=thread, sender="user", content=last_user_message
-    )
+    ChatMessage.objects.create(thread=thread, sender="user", content=last_user_message)
 
-from django.shortcuts import get_object_or_404
-from django.http import Http404
 
 def get_thread(thread_id, user):
     try:

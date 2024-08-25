@@ -26,18 +26,26 @@ def chat_with_model_stream(request, thread_id):
 
             context_str = ollama_utils.truncate_context(user_message)
 
-            # Retrieve the chat thread 
+            # Retrieve the chat thread
             thread = ollama_utils.get_thread(thread_id, request.user)
 
             # Save the user message
             ollama_utils.save_user_message(thread, user_message)
 
             # Create a generator to stream the response
-            response_generator = ollama_utils.stream_response(request, model_name="llama3.1", message={"role": "user", "content": context_str}, thread=thread, cancellation_event=cancellation_event)
+            response_generator = ollama_utils.stream_response(
+                request,
+                model_name="llama3.1",
+                message={"role": "user", "content": context_str},
+                thread=thread,
+                cancellation_event=cancellation_event,
+            )
 
             # Return a StreamingHttpResponse to stream data back to the client
-            response = StreamingHttpResponse(response_generator, content_type='text/plain')
-            response['Cache-Control'] = 'no-cache'
+            response = StreamingHttpResponse(
+                response_generator, content_type="text/plain"
+            )
+            response["Cache-Control"] = "no-cache"
             return response
 
         except json.JSONDecodeError:
@@ -50,6 +58,7 @@ def chat_with_model_stream(request, thread_id):
             return JsonResponse({"error": "An unexpected error occurred"}, status=500)
 
     return JsonResponse({"error": "Method not allowed"}, status=405)
+
 
 @login_required
 @require_POST
@@ -66,19 +75,20 @@ def chat_with_model(request, thread_id):
             context_str = ollama_utils.truncate_context(user_message)
 
             # Retrieve the chat thread
-            thread = get_object_or_404(ChatThread, id=int(thread_id), user=request.user)
+            thread = ollama_utils.get_thread(thread_id, request.user)
 
             # Save the user message
             ollama_utils.save_user_message(thread, user_message)
 
             try:
                 # Initialize the Client
-                client = Client(host="http://localhost:11434")
+                client = ollama_utils.initialize_client()
 
                 try:
                     # Get the response from the model
                     response = client.chat(
-                        model="llama3.1", messages=[{"role": "user", "content": context_str}]
+                        model="llama3.1",
+                        messages=[{"role": "user", "content": context_str}],
                     )
 
                     # Check if response is valid and extract the content
@@ -209,11 +219,13 @@ def delete_all_threads(request):
     if request.method == "DELETE":
         # Retrieve all chat threads for the current user
         threads = ChatThread.objects.filter(user=request.user)
-        
+
         # Delete all retrieved chat threads
         thread_count = threads.count()
         threads.delete()
 
-        return JsonResponse({"status": f"Successfully deleted {thread_count} threads"}, status=200)
+        return JsonResponse(
+            {"status": f"Successfully deleted {thread_count} threads"}, status=200
+        )
 
     return JsonResponse({"error": "Method not allowed"}, status=405)

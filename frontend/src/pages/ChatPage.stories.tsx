@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { RouterProvider, createMemoryRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import ChatPage from './ChatPage';
-import NotFoundPage from './NotFoundPage';
+import type { Meta, StoryObj } from "@storybook/react";
+import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ChatPage from "./ChatPage";
+import NotFoundPage from "./NotFoundPage";
 
 const queryClient = new QueryClient();
 
@@ -20,14 +20,12 @@ const router = createMemoryRouter(
   ],
   {
     initialEntries: ["/chat/new"],
-  }
+  },
 );
 
 const meta: Meta<typeof ChatPage> = {
   component: ChatPage,
-  decorators: [
-    (Story) => <RouterProvider router={router} />,
-  ],
+  decorators: [(Story) => <RouterProvider router={router} />],
 } satisfies Meta<typeof ChatPage>;
 
 export default meta;

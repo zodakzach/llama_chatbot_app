@@ -26,8 +26,6 @@ urlpatterns = [
     ),
     # Delete a specific thread
     path("threads/<int:thread_id>/delete/", views.delete_thread, name="delete_thread"),
-
     # Delete all threads for user
     path("threads/delete/", views.delete_all_threads, name="delete_all_threads"),
-
 ]

@@ -31,7 +31,7 @@ const ChatThreadsList: React.FC<ChatThreadsListProps> = ({
   };
 
   return (
-    <ul className="overflow-auto h-full">
+    <ul className="h-full overflow-auto">
       {chatThreads.map((thread) => (
         <li key={thread.id} className="flex items-center justify-between p-2">
           <NavLink

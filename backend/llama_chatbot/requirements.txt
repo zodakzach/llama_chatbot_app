@@ -1,2 +1,4 @@
 django
 ollama
+python-dotenv
+django-cors-headers

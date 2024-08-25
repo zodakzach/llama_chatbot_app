@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'; // Import the navigate hook
+import { useNavigate } from "react-router-dom"; // Import the navigate hook
 
 const API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -54,14 +54,16 @@ export const login = async (
   }
 };
 
-export const logout = async (navigate: ReturnType<typeof useNavigate>): Promise<void> => {
+export const logout = async (
+  navigate: ReturnType<typeof useNavigate>,
+): Promise<void> => {
   try {
     const response = await fetch(`${API_URL}/auth/logout/`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      credentials: 'include', // Includes cookies (e.g., session ID)
+      credentials: "include", // Includes cookies (e.g., session ID)
     });
 
     if (!response.ok) {
@@ -72,8 +74,8 @@ export const logout = async (navigate: ReturnType<typeof useNavigate>): Promise<
     console.log(data.message); // Handle the successful logout message
 
     // Navigate to the homepage if logout is successful
-    navigate('/');
+    navigate("/");
   } catch (error) {
-    console.error('Failed to log out:', error);
+    console.error("Failed to log out:", error);
   }
 };
