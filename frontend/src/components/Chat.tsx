@@ -367,8 +367,7 @@ const Chat: React.FC = () => {
                         className="h-8 w-8 rounded-full"
                       />
                     </div>
-                    <div className="max-w-xl rounded-lg p-3 break-words text-white">
-                      <p>...</p> {/* Loading ellipsis */}
+                    <div className="max-w-xl rounded-lg px-3 text-white text-2xl loading">
                     </div>
                   </div>
                 )}
