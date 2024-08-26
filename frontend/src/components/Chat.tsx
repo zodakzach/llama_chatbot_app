@@ -40,12 +40,13 @@ const Chat: React.FC = () => {
     useState<AbortController | null>(null); // State to manage abort controller
   const { mutate: sendMessage, isPending: sendMessageLoading } =
     useSendMessage();
-
+  const [loadingMessage, setLoadingMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   // Fetch messages
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ["messages", chatId],
     queryFn: () => fetchMessages(chatId!),
-    enabled: !!chatId && chatId !== "new" && !loading, // Skip the query if chatId is 'new'
+    enabled: !!chatId && chatId !== "new", // Skip the query if chatId is 'new'
     refetchOnWindowFocus: false, // Avoid refetching on window focus
     refetchOnReconnect: false, // Avoid refetching on reconnect
     refetchInterval: false, // Disable periodic refetching
@@ -53,7 +54,9 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (data) {
-      setMessages(data.messages);
+      if (data.messages.length >0){
+        setMessages(data.messages);
+      }
       setIsThreadCreated(data.isThreadCreated);
       setCurrentThreadId(data.currentThreadId);
     }
@@ -65,6 +68,7 @@ const Chat: React.FC = () => {
       setCurrentThreadId(null);
       setIsThreadCreated(false);
     }
+    setErrorMessage(null); // Clear any previous errors
   }, [location.pathname]);
 
   useEffect(() => {
@@ -146,10 +150,18 @@ const Chat: React.FC = () => {
                 updatedMessages.push({ content: newContent, sender: "bot" });
               }
 
+              // Once the first token is streamed in, stop showing the loading ellipsis
+              if (newContent) {
+                setLoadingMessage(false);
+              }
+
               return updatedMessages;
             });
           },
         };
+
+        setLoadingMessage(true);
+        setErrorMessage(null); // Clear any previous errors
 
         // Start the mutation and handle success directly
         sendMessage(params, {
@@ -158,11 +170,18 @@ const Chat: React.FC = () => {
             console.log("Message sent successfully.");
             setAbortController(null);
             setLoading(false);
+            setErrorMessage(null); // Clear any previous errors
           },
-          onError: () => {
+          onError: (error) => {
             // Actions to perform on error
             setAbortController(null);
+            setLoadingMessage(false); // Stop showing the loading ellipsis
             setLoading(false);
+
+            // Check if the error is not an abort
+            if (error.name != "AbortError") {
+              setErrorMessage("An error occurred. Please try again."); // Display the error message
+            }
           },
         });
       }
@@ -338,6 +357,36 @@ const Chat: React.FC = () => {
                     </div>
                   </div>
                 ))}
+                {/* Conditionally render the loading ellipsis or error message */}
+                {loadingMessage && (
+                  <div className="flex justify-start">
+                    <div className="relative mr-3">
+                      <img
+                        src={ollama_icon} // You can use the bot's icon again for consistency
+                        alt="Bot Avatar"
+                        className="h-8 w-8 rounded-full"
+                      />
+                    </div>
+                    <div className="max-w-xl rounded-lg p-3 break-words text-white">
+                      <p>...</p> {/* Loading ellipsis */}
+                    </div>
+                  </div>
+                )}
+
+                {errorMessage && (
+                  <div className="flex justify-start">
+                    <div className="relative mr-3">
+                      <img
+                        src={ollama_icon} // Same bot icon for consistency
+                        alt="Bot Avatar"
+                        className="h-8 w-8 rounded-full"
+                      />
+                    </div>
+                    <div className="max-w-xl rounded-lg p-3 break-words text-red-500">
+                      <p>{errorMessage}</p> {/* Error message */}
+                    </div>
+                  </div>
+                )}
                 <div ref={endOfMessagesRef} />
               </div>
             )}
