@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "accounts",
     "chat",
     "corsheaders",
+    "django_ratelimit",
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django_ratelimit.middleware.RatelimitMiddleware',
 ]
 
 ROOT_URLCONF = "llama_chatbot.urls"
@@ -161,3 +163,14 @@ CSRF_COOKIE_SECURE = False  # Use True if you are using HTTPS
 # In Django settings.py
 SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = True  # Only if using HTTPS
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': '127.0.0.1:11211',  # Replace with the correct IP/port if using a remote server
+    }
+}
+
+RATELIMIT_ENABLE = True
+RATELIMIT_USE_CACHE = 'default'
+RATELIMIT_CACHE_TIMEOUT = 60  # 1 minute

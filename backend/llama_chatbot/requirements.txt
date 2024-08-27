@@ -2,3 +2,5 @@ django
 ollama
 python-dotenv
 django-cors-headers
+django-ratelimit
+django-pylibmc
