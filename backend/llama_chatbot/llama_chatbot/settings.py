@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -52,7 +55,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'django_ratelimit.middleware.RatelimitMiddleware',
+    "django_ratelimit.middleware.RatelimitMiddleware",
 ]
 
 ROOT_URLCONF = "llama_chatbot.urls"
@@ -165,12 +168,12 @@ SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = True  # Only if using HTTPS
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-        'LOCATION': '127.0.0.1:11211',  # Replace with the correct IP/port if using a remote server
+    "default": {
+        "BACKEND": os.environ.get("CACHE_BACKEND"),
+        "LOCATION": os.environ.get("CACHE_LOCATION"),
     }
 }
 
 RATELIMIT_ENABLE = True
-RATELIMIT_USE_CACHE = 'default'
+RATELIMIT_USE_CACHE = "default"
 RATELIMIT_CACHE_TIMEOUT = 60  # 1 minute

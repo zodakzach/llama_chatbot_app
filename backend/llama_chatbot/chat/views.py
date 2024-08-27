@@ -8,13 +8,13 @@ from django.shortcuts import get_object_or_404
 from . import ollama_utils
 import threading
 from django_ratelimit.decorators import ratelimit
-from django_ratelimit.exceptions import RateLimitExceeded
+from django_ratelimit.exceptions import Ratelimited
 
 
 @login_required
 @require_POST
 @csrf_exempt
-@ratelimit(key='user_or_ip', rate='10/m', method=['POST'])
+@ratelimit(key="user_or_ip", rate="10/m", method=["POST"])
 def chat_with_model_stream(request, thread_id):
     try:
         if request.method == "POST":
@@ -58,17 +58,19 @@ def chat_with_model_stream(request, thread_id):
                 return JsonResponse({"error": "Connection error occurred"}, status=500)
             except Exception as e:
                 print(f"An unexpected error occurred: {e}")
-                return JsonResponse({"error": "An unexpected error occurred"}, status=500)
+                return JsonResponse(
+                    {"error": "An unexpected error occurred"}, status=500
+                )
         else:
             return JsonResponse({"error": "Method not allowed"}, status=405)
-    except RateLimitExceeded:
+    except Ratelimited:
         return JsonResponse({"error": "Rate limit exceeded"}, status=429)
 
 
 @login_required
 @require_POST
 @csrf_exempt
-@ratelimit(key='user_or_ip', rate='10/m', method=['POST'])
+@ratelimit(key="user_or_ip", rate="10/m", method=["POST"])
 def chat_with_model(request, thread_id):
     try:
         if request.method == "POST":
@@ -125,14 +127,14 @@ def chat_with_model(request, thread_id):
                 return JsonResponse({"error": "Invalid JSON"}, status=400)
         else:
             return JsonResponse({"error": "Method not allowed"}, status=405)
-    except RateLimitExceeded:
+    except Ratelimited:
         return JsonResponse({"error": "Rate limit exceeded"}, status=429)
 
 
 @login_required
 @csrf_exempt
 @require_GET
-@ratelimit(key='user_or_ip', rate='30/m', method=['GET'])
+@ratelimit(key="user_or_ip", rate="30/m", method=["GET"])
 def get_thread_messages(request, thread_id):
     try:
         if request.method == "GET":
@@ -153,14 +155,14 @@ def get_thread_messages(request, thread_id):
             return JsonResponse({"messages": messages_list}, status=200)
         else:
             return JsonResponse({"error": "Method not allowed"}, status=405)
-    except RateLimitExceeded:
+    except Ratelimited:
         return JsonResponse({"error": "Rate limit exceeded"}, status=429)
 
 
 @login_required
 @csrf_exempt
 @require_POST
-@ratelimit(key='user_or_ip', rate='50/h', method=['POST'])
+@ratelimit(key="user_or_ip", rate="50/h", method=["POST"])
 def start_new_thread(request):
     try:
         if request.method == "POST":
@@ -169,14 +171,14 @@ def start_new_thread(request):
             return JsonResponse({"thread_id": thread.id}, status=201)
         else:
             return JsonResponse({"error": "Method not allowed"}, status=405)
-    except RateLimitExceeded:
+    except Ratelimited:
         return JsonResponse({"error": "Rate limit exceeded"}, status=429)
 
 
 @login_required
 @require_GET
 @csrf_exempt
-@ratelimit(key='user_or_ip', rate='50/h', method=['GET'])
+@ratelimit(key="user_or_ip", rate="50/h", method=["GET"])
 def get_user_threads(request):
     try:
         # Retrieve all chat threads for the logged-in user
@@ -195,13 +197,13 @@ def get_user_threads(request):
 
         # Return the threads as JSON
         return JsonResponse({"threads": thread_data})
-    except RateLimitExceeded:
+    except Ratelimited:
         return JsonResponse({"error": "Rate limit exceeded"}, status=429)
 
 
 @login_required
 @csrf_exempt
-@ratelimit(key='user_or_ip', rate='50/h', method=['PUT'])
+@ratelimit(key="user_or_ip", rate="50/h", method=["PUT"])
 def update_thread_title(request, thread_id):
     try:
         if request.method == "PUT":
@@ -213,25 +215,29 @@ def update_thread_title(request, thread_id):
                     return JsonResponse({"error": "No title provided"}, status=400)
 
                 # Get the chat thread
-                thread = get_object_or_404(ChatThread, id=int(thread_id), user=request.user)
+                thread = get_object_or_404(
+                    ChatThread, id=int(thread_id), user=request.user
+                )
 
                 # Update the thread's title
                 thread.title = new_title
                 thread.save()
 
-                return JsonResponse({"status": "Title updated successfully"}, status=200)
+                return JsonResponse(
+                    {"status": "Title updated successfully"}, status=200
+                )
 
             except json.JSONDecodeError:
                 return JsonResponse({"error": "Invalid JSON"}, status=400)
         else:
             return JsonResponse({"error": "Method not allowed"}, status=405)
-    except RateLimitExceeded:
+    except Ratelimited:
         return JsonResponse({"error": "Rate limit exceeded"}, status=429)
 
 
 @login_required
 @csrf_exempt
-@ratelimit(key='user_or_ip', rate='50/h', method=['DELETE'])
+@ratelimit(key="user_or_ip", rate="50/h", method=["DELETE"])
 def delete_thread(request, thread_id):
     try:
         if request.method == "DELETE":
@@ -244,13 +250,13 @@ def delete_thread(request, thread_id):
             return JsonResponse({"status": "Thread deleted successfully"}, status=200)
         else:
             return JsonResponse({"error": "Method not allowed"}, status=405)
-    except RateLimitExceeded:
+    except Ratelimited:
         return JsonResponse({"error": "Rate limit exceeded"}, status=429)
 
 
 @login_required
 @csrf_exempt
-@ratelimit(key='user_or_ip', rate='50/h', method=['DELETE'])
+@ratelimit(key="user_or_ip", rate="50/h", method=["DELETE"])
 def delete_all_threads(request):
     try:
         if request.method == "DELETE":
@@ -266,5 +272,5 @@ def delete_all_threads(request):
             )
         else:
             return JsonResponse({"error": "Method not allowed"}, status=405)
-    except RateLimitExceeded:
+    except Ratelimited:
         return JsonResponse({"error": "Rate limit exceeded"}, status=429)

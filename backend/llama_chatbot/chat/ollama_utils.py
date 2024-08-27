@@ -49,7 +49,7 @@ def initialize_client():
 
 
 def stream_response(request, model_name, message, thread, cancellation_event):
-    client = initialize_client() 
+    client = initialize_client()
     if client is None:
         return
 
