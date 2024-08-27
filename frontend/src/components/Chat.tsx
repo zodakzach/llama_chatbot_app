@@ -236,7 +236,7 @@ const Chat: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col">
       {/* Full-Width Sticky Bar */}
-      <div className="fixed top-0 z-10 flex w-full max-w-[calc(100%-16rem)] items-center justify-between bg-gray-800 p-4">
+      <div className="top-0 z-10 flex w-full items-center justify-between bg-gray-800 p-4">
         <h1 className="text-xl font-bold text-white">Llama 3.1</h1>
         <DropdownButton
           triggerContent={
@@ -253,7 +253,7 @@ const Chat: React.FC = () => {
           ]}
         />
       </div>
-      <div className="mx-auto mt-16 flex h-full w-full flex-col overflow-hidden">
+      <div className="mx-auto flex h-full w-full flex-col overflow-hidden">
         <div className="flex h-full justify-center overflow-auto p-4">
           <div className="h-full w-3/5">
             {isLoading ? (
