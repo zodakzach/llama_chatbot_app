@@ -24,7 +24,7 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="p-2 text-gray-300 hover:text-white"
+          className="p-2 text-text hover:text-text"
           style={{
             outline: "none", // Removes the default focus outline
           }}
@@ -36,19 +36,20 @@ const DropdownButton: React.FC<DropdownButtonProps> = ({
 
       <DropdownMenuContent
         sideOffset={5}
-        className="w-40 rounded border border-gray-200 bg-white p-1 shadow-lg"
+        align="start" // Aligns the dropdown to the start of the trigger element
+        className="w-40 rounded-lg border border-secondary/10 bg-background p-1 shadow-lg"
       >
         {items.map((item, index) =>
           item.isSeparator ? (
             <DropdownMenuSeparator
               key={index}
-              className="my-1 h-px bg-gray-200"
+              className="my-1 h-px bg-secondary/10"
             />
           ) : (
             <DropdownMenuItem
               key={index}
               onSelect={item.onClick}
-              className="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="cursor-pointer px-4 py-2 text-sm text-text hover:bg-secondary/10"
             >
               {item.label}
             </DropdownMenuItem>

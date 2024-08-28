@@ -24,10 +24,10 @@ const HomePage: React.FC = () => {
   return (
     <div className="flex h-screen items-center justify-center">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="mb-4 text-2xl text-white">Login</h2>
+        <h2 className="mb-4 text-2xl text-text">Login</h2>
         {error && <div className="mb-4 text-red-500">{error}</div>}
         <div>
-          <label htmlFor="username" className="mb-1 block text-white">
+          <label htmlFor="username" className="mb-1 block text-text">
             Username
           </label>
           <input
@@ -40,7 +40,7 @@ const HomePage: React.FC = () => {
           />
         </div>
         <div>
-          <label htmlFor="password" className="mb-1 block text-white">
+          <label htmlFor="password" className="mb-1 block text-text">
             Password
           </label>
           <input
@@ -52,7 +52,7 @@ const HomePage: React.FC = () => {
             required
           />
         </div>
-        <button type="submit" className="rounded bg-blue-500 p-2 text-white">
+        <button type="submit" className="rounded bg-blue-500 p-2 text-text">
           Login
         </button>
       </form>

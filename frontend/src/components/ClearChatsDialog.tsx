@@ -17,11 +17,11 @@ export function ClearChatsDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="mt-auto w-full rounded-lg bg-gray-600 p-2 text-white hover:bg-gray-700">
+        <button className="mt-auto w-full rounded-lg bg-secondary/10 p-2 text-text hover:bg-secondary/20">
           Clear Chats
         </button>
       </DialogTrigger>
-      <DialogContent className="bg-gray-800 text-white">
+      <DialogContent className="bg-primary text-text">
         <DialogHeader>
           <DialogTitle>Clear All Chats</DialogTitle>
           <DialogDescription>
@@ -31,11 +31,11 @@ export function ClearChatsDialog({
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <button className="rounded-lg p-2 hover:bg-gray-200">Cancel</button>
+            <button className="rounded-lg p-2 hover:bg-secondary/10">Cancel</button>
           </DialogClose>
           <DialogClose asChild>
             <button
-              className="rounded-lg bg-red-600 p-2 text-white hover:bg-red-700"
+              className="rounded-lg bg-red-600 p-2 text-text hover:bg-red-700"
               onClick={handleDeleteAll}
             >
               Delete All

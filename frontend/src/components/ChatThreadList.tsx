@@ -38,7 +38,7 @@ const ChatThreadsList: React.FC<ChatThreadsListProps> = ({
             to={`/chat/${thread.id}`}
             className={({ isActive }) =>
               `flex w-full items-center justify-between rounded p-2 ${
-                isActive ? "bg-gray-600" : "group hover:bg-gray-700"
+                isActive ? "bg-secondary/10" : "group hover:bg-secondary/10"
               }`
             }
           >
@@ -48,7 +48,7 @@ const ChatThreadsList: React.FC<ChatThreadsListProps> = ({
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 onBlur={() => handleRename(thread.id)}
-                className="flex-1 rounded border border-gray-300 bg-transparent p-1 focus:border-blue-500 focus:outline-none"
+                className="flex-1 rounded border border-secondary/10 bg-transparent p-1 focus:border-blue-500 focus:outline-none"
                 style={{
                   overflow: "hidden",
                   textOverflow: "ellipsis",

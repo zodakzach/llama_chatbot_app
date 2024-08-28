@@ -236,8 +236,8 @@ const Chat: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col">
       {/* Full-Width Sticky Bar */}
-      <div className="top-0 z-10 flex w-full items-center justify-between bg-gray-800 p-4">
-        <h1 className="text-xl font-bold text-white">Llama 3.1</h1>
+      <div className="top-0 z-10 flex w-full items-center justify-between bg-background p-4">
+        <h1 className="text-xl font-bold text-text">Llama 3.1</h1>
         <DropdownButton
           triggerContent={
             <img
@@ -310,8 +310,8 @@ const Chat: React.FC = () => {
                     <div
                       className={`max-w-xl rounded-lg p-3 ${
                         msg.sender === "bot"
-                          ? "break-words text-white"
-                          : "bg-gray-700 text-white"
+                          ? "break-words text-text"
+                          : "bg-secondary/10 text-text"
                       }`}
                     >
                       <ReactMarkdown
@@ -324,7 +324,7 @@ const Chat: React.FC = () => {
                             const language =
                               className?.replace("language-", "") || "";
                             return className ? (
-                              <pre className="overflow-x-auto rounded bg-gray-900 p-3 text-white">
+                              <pre className="overflow-x-auto rounded bg-primary p-3 text-text">
                                 <code
                                   className={`language-${language}`}
                                   {...props}
@@ -334,7 +334,7 @@ const Chat: React.FC = () => {
                               </pre>
                             ) : (
                               <code
-                                className={`rounded bg-gray-900 p-1`}
+                                className={`rounded bg-primary p-1`}
                                 {...props}
                               >
                                 {String(children)}
@@ -367,7 +367,7 @@ const Chat: React.FC = () => {
                         className="h-8 w-8 rounded-full"
                       />
                     </div>
-                    <div className="max-w-xl rounded-lg px-3 text-white text-2xl loading">
+                    <div className="max-w-xl rounded-lg px-3 text-text text-2xl loading">
                     </div>
                   </div>
                 )}
@@ -396,7 +396,7 @@ const Chat: React.FC = () => {
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="w-full resize-none overflow-auto rounded-lg bg-gray-700 p-3 pr-16 text-white focus:outline-none"
+              className="w-full resize-none overflow-auto rounded-lg bg-secondary/10 p-3 pr-16 text-text focus:outline-none"
               placeholder="Message Llama"
               rows={1} // Start with a single line
               style={{ maxHeight: "10rem" }} // Restrict height to ~4 lines

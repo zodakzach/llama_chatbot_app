@@ -95,13 +95,13 @@ const SideBar: React.FC = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-64 bg-gray-900 text-white">
+      <div className="w-64 bg-primary text-text">
         <div className="flex flex-grow flex-col p-4">
           <div className="flex justify-between">
             <h2 className="p-2 text-xl font-bold">Chat Logs</h2>
             <button
               onClick={handleNewChat}
-              className="rounded-lg p-2 hover:bg-gray-700"
+              className="rounded-lg p-2 hover:bg-secondary/10"
             >
               <img src={newChatIcon} alt="New Chat Icon" />
             </button>

@@ -115,7 +115,7 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'America/New_York'
 
 USE_I18N = True
 
@@ -162,7 +162,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SECURE = False  # Use True if you are using HTTPS
+CSRF_COOKIE_SECURE = True  # Use True if you are using HTTPS
 # In Django settings.py
 SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = True  # Only if using HTTPS
