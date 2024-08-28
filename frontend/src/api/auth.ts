@@ -79,3 +79,47 @@ export const logout = async (
     console.error("Failed to log out:", error);
   }
 };
+
+interface RegisterResponse {
+  success: boolean;
+  message?: string;
+  username?: string;
+  email?: string;
+  error?: string;
+}
+
+export const register = async (
+  username: string,
+  email: string,
+  password: string,
+): Promise<RegisterResponse> => {
+  try {
+    const response = await fetch(`${API_URL}/auth/register/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // Make sure to include credentials
+      body: JSON.stringify({ username, email, password }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return { success: true, message: data.message, username: data.username, email: data.email };
+    } else if (response.status === 400) {
+      const data = await response.json();
+      return { success: false, error: data.error };
+    } else if (response.status === 405) {
+      return { success: false, error: "Method not allowed" };
+    } else if (response.status === 429) {
+      return { success: false, error: "Rate limit exceeded" };
+    } else {
+      return { success: false, error: "An unexpected error occurred" };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: "An error occurred while trying to register",
+    };
+  }
+};
