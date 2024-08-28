@@ -24,7 +24,7 @@ Built using Django, Django Ollama, Django CORS Headers, Django Ratelimit, and Dj
 * Python 3.x
 * Django 3.x
 * Memcache
-* django-ollama
+* ollama
 * python-dotenv
 * django-cors-headers
 * django-ratelimit
