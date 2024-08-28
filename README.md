@@ -53,3 +53,7 @@ This project features a chat interface similar to OpenAI's website, utilizing th
 
 2. **Interact with the Chat Interface:**
    Once the servers are running, your default web browser will open with the frontend application. You can now register/loggin and interact with the chat interface.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

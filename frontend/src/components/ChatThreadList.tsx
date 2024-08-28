@@ -33,11 +33,11 @@ const ChatThreadsList: React.FC<ChatThreadsListProps> = ({
   return (
     <ul className="h-full overflow-auto">
       {chatThreads.map((thread) => (
-        <li key={thread.id} className="flex items-center justify-between p-2">
+        <li key={thread.id} className="flex items-center justify-between p-1">
           <NavLink
             to={`/chat/${thread.id}`}
             className={({ isActive }) =>
-              `flex w-full items-center justify-between rounded p-2 ${
+              `flex w-full items-center justify-between rounded-lg p-1 ${
                 isActive ? "bg-secondary/10" : "group hover:bg-secondary/10"
               }`
             }
@@ -48,7 +48,7 @@ const ChatThreadsList: React.FC<ChatThreadsListProps> = ({
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 onBlur={() => handleRename(thread.id)}
-                className="flex-1 rounded border border-secondary/10 bg-transparent p-1 focus:border-blue-500 focus:outline-none"
+                className="flex-1 rounded-lg border border-secondary/10 bg-transparent p-1 focus:border-blue-500 focus:outline-none"
                 style={{
                   overflow: "hidden",
                   textOverflow: "ellipsis",
