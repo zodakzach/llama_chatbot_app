@@ -95,7 +95,7 @@ const SideBar: React.FC = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-64 bg-primary text-text border-r border-secondary/20">
+      <div className="w-64 border-r border-secondary/20 bg-primary text-text">
         <div className="flex flex-grow flex-col p-4">
           <div className="flex justify-between">
             <h2 className="p-2 text-xl font-bold">Chat Logs</h2>

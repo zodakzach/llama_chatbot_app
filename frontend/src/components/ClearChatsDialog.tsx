@@ -31,7 +31,9 @@ export function ClearChatsDialog({
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <button className="rounded-lg p-2 hover:bg-secondary/10">Cancel</button>
+            <button className="rounded-lg p-2 hover:bg-secondary/10">
+              Cancel
+            </button>
           </DialogClose>
           <DialogClose asChild>
             <button

@@ -54,7 +54,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (data) {
-      if (data.messages.length >0){
+      if (data.messages.length > 0) {
         setMessages(data.messages);
       }
       setIsThreadCreated(data.isThreadCreated);
@@ -367,8 +367,7 @@ const Chat: React.FC = () => {
                         className="h-8 w-8 rounded-full"
                       />
                     </div>
-                    <div className="max-w-xl rounded-lg px-3 text-text text-2xl loading">
-                    </div>
+                    <div className="loading max-w-xl rounded-lg px-3 text-2xl text-text"></div>
                   </div>
                 )}
 
@@ -381,7 +380,7 @@ const Chat: React.FC = () => {
                         className="h-8 w-8 rounded-full"
                       />
                     </div>
-                    <div className="max-w-xl rounded-lg p-3 break-words text-red-500">
+                    <div className="max-w-xl break-words rounded-lg p-3 text-red-500">
                       <p>{errorMessage}</p> {/* Error message */}
                     </div>
                   </div>

@@ -12,14 +12,12 @@ const router = createMemoryRouter(
   ],
   {
     initialEntries: ["/some-non-existent-page"], // Adjust the path as needed
-  }
+  },
 );
 
 const meta: Meta<typeof NotFoundPage> = {
   component: NotFoundPage,
-  decorators: [
-    (Story) => <RouterProvider router={router} />,
-  ],
+  decorators: [(Story) => <RouterProvider router={router} />],
   title: "Pages/NotFoundPage",
 };
 

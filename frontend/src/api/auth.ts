@@ -105,7 +105,12 @@ export const register = async (
 
     if (response.ok) {
       const data = await response.json();
-      return { success: true, message: data.message, username: data.username, email: data.email };
+      return {
+        success: true,
+        message: data.message,
+        username: data.username,
+        email: data.email,
+      };
     } else if (response.status === 400) {
       const data = await response.json();
       return { success: false, error: data.error };

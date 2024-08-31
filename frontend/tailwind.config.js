@@ -1,4 +1,4 @@
-import { background } from 'storybook/internal/theming';
+import { background } from "storybook/internal/theming";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -6,10 +6,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#171717',
-        text: '#D7DADC',
-        background: '#212121',
-        secondary: '#ffffff',
+        primary: "#171717",
+        text: "#D7DADC",
+        background: "#212121",
+        secondary: "#ffffff",
       },
     },
   },

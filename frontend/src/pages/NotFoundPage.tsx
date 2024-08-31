@@ -9,7 +9,7 @@ function NotFoundPage() {
       </p>
       <Link
         to="/"
-        className="mt-4 rounded bg-blue-600 px-4 py-2 text-text transition duration-200 hover:bg-blue-700"
+        className="mt-4 rounded bg-blue-600 px-4 py-2 text-text transition duration-200 hover:bg-blue-500"
       >
         Go Back Home
       </Link>
