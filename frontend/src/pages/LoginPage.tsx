@@ -23,8 +23,8 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="flex h-screen items-center justify-center">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="mb-4 text-2xl text-text">Login</h2>
+      <form onSubmit={handleSubmit} className="space-y-4 bg-secondary/10 rounded-lg w-1/3 flex flex-col items-center">
+        <h2 className="py-4 text-2xl text-text font-bold">Login</h2>
         {error && <div className="mb-4 text-red-500">{error}</div>}
         <div>
           <label htmlFor="username" className="mb-1 block text-text">
@@ -52,21 +52,21 @@ const LoginPage: React.FC = () => {
             required
           />
         </div>
-        <button type="submit" className="rounded bg-blue-500 p-2 text-text">
+        <button type="submit" className="rounded-lg bg-blue-600 p-2 text-text hover:bg-blue-500 font-semibold">
           Login
         </button>
-        <div className="flex justify-between">
+        <div className="flex justify-between p-4">
           <button
             type="button"
             onClick={() => navigate("/register")}
-            className="rounded bg-secondary/20 p-2 text-text"
+            className="rounded-lg bg-secondary/20 p-2 text-text mr-5 hover:bg-secondary/30"
           >
             Sign Up
           </button>
           <button
             type="button"
             onClick={() => navigate("/")}
-            className="rounded bg-secondary/20 p-2 text-text"
+            className="rounded-lg bg-secondary/20 p-2 text-text hover:bg-secondary/30"
           >
             Back
           </button>

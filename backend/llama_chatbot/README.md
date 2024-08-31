@@ -9,7 +9,7 @@ A Django-based backend API for a chat application, featuring:
 * **Rate Limiting**: Implemented using Django Ratelimit to prevent abuse
 * **CORS**: Configured to allow cross-origin requests from frontend applications
 
-Built using Django, Django Ollama, Django CORS Headers, Django Ratelimit, and Django Pylibmc.
+Built using Django, Ollama, Django CORS Headers, Django Ratelimit, and Django Pylibmc.
 ## Table of Contents
 
 * [Requirements](#requirements)

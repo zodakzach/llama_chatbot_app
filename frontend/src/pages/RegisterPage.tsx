@@ -23,9 +23,9 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="flex h-screen items-center justify-center">
-      <form className="space-y-4"
+      <form className=" flex flex-col space-y-4 bg-secondary/10 w-1/3 items-center rounded-lg shadow-lg"
       onSubmit={handleSubmit}>
-        <h2 className="mb-4 text-2xl text-text">Register</h2>
+        <h2 className="py-4 text-2xl text-text font-bold">Register</h2>
         {error && <div className="mb-4 text-red-500">{error}</div>}
         <div>
           <label htmlFor="username" className="mb-1 block text-text">
@@ -66,21 +66,21 @@ const RegisterPage: React.FC = () => {
             required
           />
         </div>
-        <button type="submit" className="rounded bg-blue-500 p-2 text-text">
+        <button type="submit" className="rounded-lg bg-blue-600 p-2 text-text font-semibold hover:bg-blue-500">
           Register
         </button>
-        <div className="flex justify-between">
+        <div className="flex justify-between p-4">
           <button
             type="button"
             onClick={() => navigate("/login")}
-            className="rounded bg-secondary/20 p-2 text-text"
+            className="rounded-lg bg-secondary/20 p-2 text-text mr-5 hover:bg-secondary/30"
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => navigate("/")}
-            className="rounded bg-secondary/20 p-2 text-text"
+            className="rounded-lg bg-secondary/20 p-2 text-text hover:bg-secondary/30"
           >
             Cancel
           </button>

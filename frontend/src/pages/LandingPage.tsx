@@ -20,15 +20,15 @@ function LandingPage() {
         Chat with Llama Bot, a conversational AI powered by the Meta LLaMA 3.1-8B model.
         Ask me anything, from general knowledge to fun conversations.
     </p>
-    <div className='flex justify-center p-5 md:w-1/4 '>
+    <div className='flex justify-center p-5 md:w-1/4'>
         <button 
-            className='text-text bg-secondary/20 rounded-full p-5 mr-5 font-semibold w-1/2'
+            className='text-text bg-secondary/20 rounded-full p-5 mr-5 font-semibold w-1/2 hover:bg-secondary/30'
             onClick={handleLoginClick}
         >
             Login
         </button>
         <button 
-        className='text-text bg-blue-600 rounded-full p-5 font-bold w-1/2'
+        className='text-text bg-blue-600 rounded-full p-5 font-bold w-1/2 hover:bg-blue-500'
         onClick={handleRegisterClick}
         >
             Sign Up
