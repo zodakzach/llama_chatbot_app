@@ -13,10 +13,9 @@ RUN apt-get update && \
     apt-get install -y \
         build-essential \
         libpq-dev \
-        libmemcached-dev \
+        libmemcached-dev \ 
         libz-dev \
         curl && \
-    curl -fsSL https://ollama.com/install.sh | sh && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
