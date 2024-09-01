@@ -19,13 +19,11 @@ services:
       - "11211:11211"
 
   ollama:
-    image: ollama/ollama:rocm  # Replace with the correct image name for Ollama
+    image: ollama/ollama:rocm
     ports:
-      - "11434:11434"  
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: amd
-              count: all
-              capabilities: [gpu]
+      - "11434:11434"
+    devices:
+      - "/dev/kfd:/dev/kfd"  # Device for ROCm
+      - "/dev/dri:/dev/dri"  # Device for Direct Rendering Infrastructure
+    volumes:
+      - ollama:/root/.ollama
