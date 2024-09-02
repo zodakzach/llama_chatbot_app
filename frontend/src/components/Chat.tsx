@@ -328,7 +328,8 @@ const Chat: React.FC = () => {
                             return className ? (
                               <SyntaxHighlighter
                               language={language}
-                              style={theme} // Type casting to fix error
+                              // @ts-ignore
+                              style={theme}
                               PreTag="div"
                               className="overflow-x-auto rounded-lg p-3 text-text border border-secondary/10 shadown-lg" // Retain custom styles
                               {...props}
