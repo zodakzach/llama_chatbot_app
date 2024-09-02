@@ -39,7 +39,7 @@ def chat_with_model_stream(request, thread_id):
                 response_generator = ollama_utils.stream_response(
                     request,
                     model_name="llama3.1",
-                    message={"role": "user", "content": context_str},
+                    context=context_str,
                     thread=thread,
                     cancellation_event=cancellation_event,
                 )

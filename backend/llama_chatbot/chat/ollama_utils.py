@@ -26,7 +26,7 @@ def truncate_context(context_str):
     Returns:
         str: The truncated string within the 5000 character limit.
     """
-    max_length = 5000
+    max_length = 128000
 
     # Check if the context exceeds the maximum length
     while len(context_str) > max_length:
@@ -48,17 +48,19 @@ def initialize_client():
         return None
 
 
-def stream_response(request, model_name, message, thread, cancellation_event):
+def stream_response(request, model_name, context, thread, cancellation_event):
     client = initialize_client()
     if client is None:
         return
+    
+    messages = break_context_into_messages(context)
 
     response = ""  # Store the partial response here
 
     def stream():
         nonlocal response
         try:
-            for part in client.chat(model=model_name, messages=[message], stream=True):
+            for part in client.chat(model=model_name, messages=messages, stream=True):
                 if cancellation_event.is_set():
                     print("Streaming cancelled.")
                     break
@@ -111,3 +113,37 @@ def get_thread(thread_id, user):
         return get_object_or_404(ChatThread, id=int(thread_id), user=user)
     except Http404:
         raise Http404("ChatThread does not exist.")
+
+def break_context_into_messages(context_str):
+    """
+    Convert a context string into a list of messages.
+    
+    Args:
+        context_str (str): The context string to be parsed.
+    
+    Returns:
+        list: A list of message dictionaries with 'role' and 'content'.
+    """
+    messages = []
+    
+    # Split the context string by newline characters
+    lines = context_str.split("\n")
+    
+    # Process each line to create message dictionaries
+    for line in lines:
+        # Skip empty lines
+        if not line.strip():
+            continue
+        
+        # Split each line into sender and content
+        try:
+            sender, content = line.split(": ", 1)
+            messages.append({
+                'role': sender.strip(),
+                'content': content.strip()
+            })
+        except ValueError:
+            # Handle lines that don't have ": " in them
+            continue
+    
+    return messages
