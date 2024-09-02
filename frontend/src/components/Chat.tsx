@@ -330,7 +330,7 @@ const Chat: React.FC = () => {
                               language={language}
                               style={theme} // Type casting to fix error
                               PreTag="div"
-                              className="overflow-x-auto rounded-lg p-3 text-text" // Retain custom styles
+                              className="overflow-x-auto rounded-lg p-3 text-text border border-secondary/10 shadown-lg" // Retain custom styles
                               {...props}
                             >
                                 {String(children).replace(/\n$/, "")}
