@@ -23,6 +23,8 @@ import DropdownButton from "./DropdownButton";
 import { logout } from "../api/auth"; // Import the logout function from the auth file
 import { useSendMessage } from "../hooks/useSendMessage";
 import stopIcon from "../assets/images/stop-fill.svg";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus as theme } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -324,17 +326,18 @@ const Chat: React.FC = () => {
                             const language =
                               className?.replace("language-", "") || "";
                             return className ? (
-                              <pre className="overflow-x-auto rounded bg-primary p-3 text-text">
-                                <code
-                                  className={`language-${language}`}
-                                  {...props}
-                                >
-                                  {String(children).replace(/\n$/, "")}
-                                </code>
-                              </pre>
+                              <SyntaxHighlighter
+                              language={language}
+                              style={theme} // Type casting to fix error
+                              PreTag="div"
+                              className="overflow-x-auto rounded-lg p-3 text-text" // Retain custom styles
+                              {...props}
+                            >
+                                {String(children).replace(/\n$/, "")}
+                              </SyntaxHighlighter>
                             ) : (
                               <code
-                                className={`rounded bg-primary p-1`}
+                                className={`rounded-lg bg-[#1E1E1E] p-1 text-text`}
                                 {...props}
                               >
                                 {String(children)}
