@@ -58,6 +58,10 @@ def logout_view(request):
 @require_GET
 @ratelimit(key="user_or_ip", rate="100/h", method=["GET"])
 def check_login_status(request):
+    # Get the session ID from cookies
+    session_id = request.COOKIES.get('sessionid')
+    print(f"Session ID: {session_id}")
+    
     try:
         if request.user.is_authenticated:
             return JsonResponse({"message": "User is logged in"}, status=200)
