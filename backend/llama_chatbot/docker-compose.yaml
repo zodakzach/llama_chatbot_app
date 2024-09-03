@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/app 
+      - ~/certs:/certs  # Mount the directory containing your SSL certificates
     ports:
       - "8000:8000"
     env_file:

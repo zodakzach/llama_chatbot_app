@@ -30,7 +30,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '54.86.237.119']
 
-SECURE_SSL_REDIRECT = False
+SECURE_HSTS_SECONDS = 31536000  # Enables HTTP Strict Transport Security (HSTS) for 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_PRELOAD = True
 
 # Application definition
 
@@ -45,6 +48,7 @@ INSTALLED_APPS = [
     "chat",
     "corsheaders",
     "django_ratelimit",
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -163,12 +167,11 @@ CSRF_TRUSTED_ORIGINS = [
 
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SECURE = False  # Use True if you are using HTTPS
+CSRF_COOKIE_SECURE = True  # Use True if you are using HTTPS
 
 # Session configuration
 SESSION_COOKIE_NAME = "sessionid"
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
+SESSION_COOKIE_SECURE = True  # Set to True if using HTTPS
 SESSION_COOKIE_SAMESITE = "None"
 
 CACHES = {

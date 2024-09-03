@@ -30,5 +30,6 @@ COPY . /app/
 # Expose the port the app runs on
 EXPOSE 8000
 
-# Use the start.sh script to start services
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Command to run the Django development server with SSL
+CMD ["python", "manage.py", "runserver_plus", "--cert-file", "/certs/server.crt", "--key-file", "/certs/server.key", "0.0.0.0:8000"]
+
