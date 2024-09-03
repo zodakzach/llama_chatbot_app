@@ -28,8 +28,8 @@ RUN pip install --upgrade pip && \
 COPY . /app/
 
 # Expose the port the app runs on
-EXPOSE 8000
+EXPOSE 443
 
 # Command to run the Django development server with SSL
-CMD ["python", "manage.py", "runserver_plus", "--cert-file", "/certs/server.crt", "--key-file", "/certs/server.key", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver_plus", "--cert-file", "/certs/server.crt", "--key-file", "/certs/server.key", "0.0.0.0:443"]
 

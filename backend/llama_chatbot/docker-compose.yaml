@@ -7,7 +7,7 @@ services:
       - .:/app 
       - ~/certs:/certs  # Mount the directory containing your SSL certificates
     ports:
-      - "8000:8000"
+      - "443:443"
     env_file:
       - .env
     depends_on:
