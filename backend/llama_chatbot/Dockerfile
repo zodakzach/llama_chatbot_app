@@ -27,10 +27,6 @@ RUN pip install --upgrade pip && \
 # Copy the Django project files to the container
 COPY . /app/
 
-# Copy the start.sh script to the container
-COPY start.sh /app/
-RUN chmod +x /app/start.sh
-
 # Expose the port the app runs on
 EXPOSE 8000
 
