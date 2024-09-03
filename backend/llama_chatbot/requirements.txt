@@ -5,3 +5,5 @@ django-cors-headers
 django-ratelimit
 django-pylibmc
 django-extensions
+Werkzeug
+pyOpenSSL

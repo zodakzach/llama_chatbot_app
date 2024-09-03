@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "start:backend": "cd ../backend/llama_chatbot && python3 manage.py runserver",
+    "start:backend": "cd ../backend/llama_chatbot && python3 manage.py runserver_plus --cert-file ~/certs/server.crt --key-file ~/certs/server.key",
     "start:frontend": "vite --open"
   },
   "dependencies": {
