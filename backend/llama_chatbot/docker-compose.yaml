@@ -19,14 +19,19 @@ services:
       - "11211:11211"
 
   ollama:
-    image: ollama/ollama:rocm
+    image: ollama/ollama:latest
     ports:
       - "11434:11434"
-    devices:
-      - "/dev/kfd:/dev/kfd"  # Device for ROCm
-      - "/dev/dri:/dev/dri"  # Device for Direct Rendering Infrastructure
     volumes:
       - ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    runtime: nvidia  # Use the NVIDIA runtime
       
 volumes:
   ollama:
