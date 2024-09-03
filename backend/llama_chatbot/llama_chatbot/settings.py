@@ -163,10 +163,13 @@ CSRF_TRUSTED_ORIGINS = [
 
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SECURE = True  # Use True if you are using HTTPS
-# In Django settings.py
+CSRF_COOKIE_SECURE = False  # Use True if you are using HTTPS
+
+# Session configuration
+SESSION_COOKIE_NAME = "sessionid"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
 SESSION_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SECURE = True  # Only if using HTTPS
 
 CACHES = {
     "default": {
