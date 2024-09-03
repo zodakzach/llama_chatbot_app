@@ -35,4 +35,4 @@ RUN chmod +x /app/start.sh
 EXPOSE 8000
 
 # Use the start.sh script to start services
-CMD ["/app/start.sh"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
