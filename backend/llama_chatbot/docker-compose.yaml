@@ -27,3 +27,6 @@ services:
       - "/dev/dri:/dev/dri"  # Device for Direct Rendering Infrastructure
     volumes:
       - ollama:/root/.ollama
+      
+volumes:
+  ollama:
