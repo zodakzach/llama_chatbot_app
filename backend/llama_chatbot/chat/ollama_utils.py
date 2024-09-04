@@ -16,7 +16,7 @@ OLLAMA_HOST = os.getenv("OLLAMA_HOST")
 
 def truncate_context(context_str):
     """
-    Truncate a given string to 5000 characters if it exceeds the limit.
+    Truncate a given string to 125000 characters if it exceeds the limit.
     If the string is too long, split it by newline characters and remove
     older messages until the total length is within the limit.
 
@@ -24,9 +24,9 @@ def truncate_context(context_str):
         context_str (str): The input string to be truncated.
 
     Returns:
-        str: The truncated string within the 5000 character limit.
+        str: The truncated string within the 125000 character limit.
     """
-    max_length = 128000
+    max_length = 125000
 
     # Check if the context exceeds the maximum length
     while len(context_str) > max_length:
@@ -53,7 +53,20 @@ def stream_response(request, model_name, context, thread, cancellation_event):
     if client is None:
         return
     
-    messages = break_context_into_messages(context)
+    # Define the system message prompt to provide context to the LLM
+    system_prompt = {
+        "role": "system",
+        "content": (
+            "You are an AI assistant named Llama Chat, designed to help users with various questions, "
+            "provide explanations, and engage in interactive conversations. You are friendly, informative, "
+            "and concise in your responses. When answering, aim to provide clear, accurate, and helpful information. "
+            "If you don't know the answer or if a question is unclear, ask for clarification or suggest a way to find more information. "
+            "Avoid making up facts, and ensure that your responses align with the user's context and needs."
+        )
+    }
+
+    # Break context into messages and prepend the system message
+    messages = [system_prompt] + break_context_into_messages(context)
 
     response = ""  # Store the partial response here
 
