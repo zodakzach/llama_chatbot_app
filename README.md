@@ -2,6 +2,11 @@
 
 This project features a chat interface similar to OpenAI's website, utilizing the Llama 3.1 model for generating responses. It includes a frontend built with React and TypeScript, and a backend developed using Django.
 
+<p align="center">
+  <img src="frontend/src/assets/images/LlamaChatThumbnail.png" alt="Image 1" width="45%" />
+  <img src="frontend/src/assets/images/llama-chat.png" alt="Image 2" width="45%" />
+</p>
+
 ## Project Structure
 
 - **Frontend**: Located in the `frontend` directory. [Frontend README](./frontend/README.md)
