@@ -1,6 +1,6 @@
 # Llama ChatBot Application
 
-This project features a chat interface similar to OpenAI's website, utilizing the Llama 3.1 model for generating responses. It includes a frontend built with React and TypeScript, and a backend developed using Django.
+This project features a chat interface similar to OpenAI's website, utilizing the Llama 3.1 model and [Ollama]([https://ollama.com/](https://github.com/ollama/ollama)) for generating responses. It includes a frontend built with React and TypeScript, and a backend developed using Django.
 
 <p align="center">
   <img src="frontend/src/assets/images/LlamaChatThumbnail.png" alt="Image 1" width="45%" />
