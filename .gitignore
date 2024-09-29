@@ -6,3 +6,4 @@ nodemodules
 *.pem
 *.sqlite3
 backend/llama_chatbot/db.sqlite3
+*.log

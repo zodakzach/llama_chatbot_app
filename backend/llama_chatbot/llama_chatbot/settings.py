@@ -28,9 +28,11 @@ SECRET_KEY = "django-insecure-4b)pcnit-a92&0#4llnyz_dm)pniy4(qj#1y&+g3f_&z8v&s@j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '54.86.237.119']
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
-SECURE_HSTS_SECONDS = 31536000  # Enables HTTP Strict Transport Security (HSTS) for 1 year
+SECURE_HSTS_SECONDS = (
+    31536000  # Enables HTTP Strict Transport Security (HSTS) for 1 year
+)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_PRELOAD = True
@@ -48,7 +50,7 @@ INSTALLED_APPS = [
     "chat",
     "corsheaders",
     "django_ratelimit",
-    'django_extensions',
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -168,7 +170,7 @@ CSRF_TRUSTED_ORIGINS = [
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SECURE = True  # Use True if you are using HTTPS
-CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = "None"
 
 # Session configuration
 SESSION_COOKIE_NAME = "sessionid"
@@ -185,3 +187,60 @@ CACHES = {
 RATELIMIT_ENABLE = True
 RATELIMIT_USE_CACHE = "default"
 RATELIMIT_CACHE_TIMEOUT = 60  # 1 minute
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        "file": {
+            "level": "WARNING",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs", "django_warnings.log"),
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": [],  # To be set conditionally based on environment
+            "level": "INFO",
+            "propagate": True,
+        },
+        "chat": {  # Logger for the chat app
+            "handlers": ["console"],  # Logs to console by default in development
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "accounts": {  # Logger for the auth app
+            "handlers": ["console"],  # Logs to console by default in development
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+}
+
+# Conditional logging configuration based on environment
+if DEBUG:
+    LOGGING["loggers"]["django"]["handlers"] = ["console"]
+else:
+    LOGGING["loggers"]["django"]["handlers"] = ["file"]
+    LOGGING["loggers"]["chat"]["handlers"] = [
+        "file"
+    ]  # In production, log to file for 'chat'
+    LOGGING["loggers"]["accounts"]["handlers"] = [
+        "file"
+    ]  # In production, log to file for 'auth'
