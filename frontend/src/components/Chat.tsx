@@ -44,14 +44,20 @@ const Chat: React.FC = () => {
     useSendMessage();
   const [loadingMessage, setLoadingMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null); // Create a ref for the textarea
+
+  // Check if a new thread is created by reading from location state
+  const isNewThread = location.state?.isNewThread || false;
+
   // Fetch messages
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ["messages", chatId],
     queryFn: () => fetchMessages(chatId!),
-    enabled: !!chatId && chatId !== "new", // Skip the query if chatId is 'new'
+    enabled: !!chatId && chatId !== "new" && !isNewThread, // Skip the query if chatId is 'new'
     refetchOnWindowFocus: false, // Avoid refetching on window focus
     refetchOnReconnect: false, // Avoid refetching on reconnect
     refetchInterval: false, // Disable periodic refetching
+    staleTime: Infinity, // Cache data until manually invalidated
   });
 
   useEffect(() => {
@@ -102,7 +108,7 @@ const Chat: React.FC = () => {
         ...prevThreads,
         { id: Number(threadId), title: "New Chat" },
       ]);
-      navigate(`/chat/${threadId}`);
+      navigate(`/chat/${threadId}`, { state: { isNewThread: true } });
     },
     onError: (error: Error) => {
       console.error("Failed to create thread:", error);
@@ -157,6 +163,13 @@ const Chat: React.FC = () => {
                 setLoadingMessage(false);
               }
 
+              // Update messages in cache without refetching
+              queryClient.setQueryData(["messages", threadId], {
+                messages: updatedMessages, // The new messages you want to set
+                isThreadCreated: isThreadCreated, 
+                currentThreadId: threadId, // The current thread ID you're working with
+              });
+
               return updatedMessages;
             });
           },
@@ -199,6 +212,7 @@ const Chat: React.FC = () => {
 
       const userMsg = input;
       setInput("");
+      resetTextareaHeight();
 
       // Create a single string from the conversation history including the user's message
       const context = [
@@ -210,6 +224,14 @@ const Chat: React.FC = () => {
 
       handleCreateThreadAndSendMessage(userMsg, context);
     }
+  };
+
+  const resetTextareaHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.value = ""
+      textareaRef.current.style.height = "auto"; // Reset height
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Set height based on scrollHeight   
+      }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -398,6 +420,7 @@ const Chat: React.FC = () => {
           <form onSubmit={handleSubmit} className="relative mb-5 w-3/5 p-4">
             <textarea
               value={input}
+              ref={textareaRef} // Assign ref to the textarea
               onChange={(e) => setInput(e.target.value)}
               className="w-full resize-none overflow-auto rounded-lg bg-secondary/10 p-3 pr-16 text-text focus:outline-none"
               placeholder="Message Llama"

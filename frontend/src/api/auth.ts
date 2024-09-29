@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom"; // Import the navigate hook
 
-const API_URL = import.meta.env.VITE_BACKEND_API_URL;
-
+const API_URL = import.meta.env.VITE_ENV === 'prod' 
+  ? import.meta.env.VITE_BACKEND_API_URL 
+  : import.meta.env.VITE_BACKEND_API_LOCAL_URL;
+  
 export const checkLoginStatus = async (): Promise<boolean> => {
   try {
     const response = await fetch(`${API_URL}/auth/status/`, {

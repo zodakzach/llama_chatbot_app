@@ -10,8 +10,10 @@ export interface ChatThread {
   title: string;
 }
 
-const API_URL = import.meta.env.VITE_BACKEND_API_URL;
-
+const API_URL = import.meta.env.VITE_ENV === 'prod' 
+  ? import.meta.env.VITE_BACKEND_API_URL 
+  : import.meta.env.VITE_BACKEND_API_LOCAL_URL;
+  
 export const fetchMessages = async (
   chatId: string,
 ): Promise<{
