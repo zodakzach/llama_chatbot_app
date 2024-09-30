@@ -19,6 +19,9 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Install Nginx for reverse proxy
+RUN apt-get update && apt-get install -y nginx
+
 # Copy the requirements file and install Python dependencies
 COPY requirements.txt /app/
 RUN pip install --upgrade pip && \
@@ -27,9 +30,15 @@ RUN pip install --upgrade pip && \
 # Copy the Django project files to the container
 COPY . /app/
 
+# Copy Nginx configuration file
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # Expose the port the app runs on
+EXPOSE 80
 EXPOSE 443
 
 # Command to run the Django development server with SSL
-CMD ["python", "manage.py", "runserver_plus", "--cert-file", "/certs/server.crt", "--key-file", "/certs/server.key", "0.0.0.0:443"]
+# CMD ["python", "manage.py", "runserver_plus", "--cert-file", "/certs/server.crt", "--key-file", "/certs/server.key", "0.0.0.0:443"]
 
+# Run Uvicorn server in the background and start Nginx
+CMD ["/bin/bash", "-c", "uvicorn llama_chatbot.asgi:application --host 0.0.0.0 --port 8000 --workers 4 & nginx -g 'daemon off;'"]

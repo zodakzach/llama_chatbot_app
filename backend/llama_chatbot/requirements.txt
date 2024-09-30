@@ -7,3 +7,5 @@ django-pylibmc
 django-extensions
 Werkzeug
 pyOpenSSL
+uvicorn
+gunicorn

@@ -1,5 +1,5 @@
 services:
-  web:
+  llama-bot:
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,6 +8,7 @@ services:
       - ~/certs:/certs  # Mount the directory containing your SSL certificates
     ports:
       - "443:443"
+      - "80:80"
     env_file:
       - .env
     depends_on:
