@@ -38,7 +38,7 @@ EXPOSE 80
 EXPOSE 443
 
 # Command to run the Django development server with SSL
-# CMD ["python", "manage.py", "runserver_plus", "--cert-file", "/certs/server.crt", "--key-file", "/certs/server.key", "0.0.0.0:443"]
+# CMD ["python", "manage.py", "runserver_plus", "--cert-file", "/certs/localhost.pem", "--key-file", "/certs/localhost-key.pem", "0.0.0.0:443"]
 
-# Run Uvicorn server in the background and start Nginx
-CMD ["/bin/bash", "-c", "uvicorn llama_chatbot.asgi:application --host 0.0.0.0 --port 8000 --workers 4 & nginx -g 'daemon off;'"]
+# Run gunicorn server in the background and start Nginx
+CMD ["bash", "-c", "gunicorn --bind 0.0.0.0:8000 --workers 4 llama_chatbot.wsgi:application & nginx -g 'daemon off;'"]

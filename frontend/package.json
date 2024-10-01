@@ -4,15 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
-    "dev": "vite",
+    "start": "npm run start:frontend",
+    "dev": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write .",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "start:backend": "cd ../backend/llama_chatbot && python3 manage.py runserver_plus --cert-file ~/certs/server.crt --key-file ~/certs/server.key",
+    "start:backend": "cd ../backend/llama_chatbot && python3 manage.py runserver_plus --cert-file ~/certs/localhost.pem --key-file ~/certs/localhost-key.pem",
     "start:frontend": "vite --open"
   },
   "dependencies": {
