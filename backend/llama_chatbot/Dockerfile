@@ -41,4 +41,4 @@ EXPOSE 443
 # CMD ["python", "manage.py", "runserver_plus", "--cert-file", "/certs/localhost.pem", "--key-file", "/certs/localhost-key.pem", "0.0.0.0:443"]
 
 # Run gunicorn server in the background and start Nginx
-CMD ["bash", "-c", "gunicorn --bind 0.0.0.0:8000 --workers 4 llama_chatbot.wsgi:application & nginx -g 'daemon off;'"]
+CMD ["bash", "-c", "gunicorn --bind 0.0.0.0:8000 --workers 4 --worker-class gevent --timeout 300 llama_chatbot.wsgi:application & nginx -g 'daemon off;'"]

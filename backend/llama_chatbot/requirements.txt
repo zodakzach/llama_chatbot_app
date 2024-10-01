@@ -8,3 +8,4 @@ django-extensions
 Werkzeug
 pyOpenSSL
 gunicorn
+gevent
